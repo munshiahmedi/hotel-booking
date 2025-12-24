@@ -1,0 +1,1208 @@
+﻿{
+  "info": {
+    "name": "Hotel Booking API - Complete",
+    "description": "Complete API collection for Hotel Booking System with all modules",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"+1234567890\",\n  \"role_id\": 2\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"]}
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/users?page=1&limit=10", "host": ["{{baseUrl}}"], "path": ["api", "users"], "query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "10"}]}
+          }
+        },
+        {
+          "name": "Get User by ID (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/users/1", "host": ["{{baseUrl}}"], "path": ["api", "users", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "Get All Roles",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/roles", "host": ["{{baseUrl}}"], "path": ["api", "roles"]}
+          }
+        },
+        {
+          "name": "Create Role (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"manager\",\n  \"description\": \"Hotel manager role\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/roles", "host": ["{{baseUrl}}"], "path": ["api", "roles"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Permissions",
+      "item": [
+        {
+          "name": "Get All Permissions",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/permissions", "host": ["{{baseUrl}}"], "path": ["api", "permissions"]}
+          }
+        },
+        {
+          "name": "Create Permission (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"manage_hotels\",\n  \"description\": \"Can manage hotels\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/permissions", "host": ["{{baseUrl}}"], "path": ["api", "permissions"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Role Permissions",
+      "item": [
+        {
+          "name": "Get Role Permissions",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/role-permissions", "host": ["{{baseUrl}}"], "path": ["api", "role-permissions"]}
+          }
+        },
+        {
+          "name": "Assign Permission to Role (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"role_id\": 2,\n  \"permission_id\": 1\n}"},
+            "url": {"raw": "{{baseUrl}}/api/role-permissions", "host": ["{{baseUrl}}"], "path": ["api", "role-permissions"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Sessions",
+      "item": [
+        {
+          "name": "Get My Sessions",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/sessions/my-sessions", "host": ["{{baseUrl}}"], "path": ["api", "sessions", "my-sessions"]}
+          }
+        },
+        {
+          "name": "Create Session",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"user_id\": 1,\n  \"ip_address\": \"192.168.1.1\",\n  \"user_agent\": \"Mozilla/5.0...\",\n  \"expires_at\": \"2024-12-31T23:59:59Z\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/sessions", "host": ["{{baseUrl}}"], "path": ["api", "sessions"]}
+          }
+        },
+        {
+          "name": "Delete Session (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/sessions/1", "host": ["{{baseUrl}}"], "path": ["api", "sessions", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Addresses",
+      "item": [
+        {
+          "name": "Get My Addresses",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/addresses/my-addresses?page=1&limit=10", "host": ["{{baseUrl}}"], "path": ["api", "addresses", "my-addresses"], "query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "10"}]}
+          }
+        },
+        {
+          "name": "Create Address",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"country_id\": 1,\n  \"state_id\": 1,\n  \"city_id\": 1,\n  \"line1\": \"123 Main Street\",\n  \"zipcode\": \"10001\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/addresses/my-addresses", "host": ["{{baseUrl}}"], "path": ["api", "addresses", "my-addresses"]}
+          }
+        },
+        {
+          "name": "Update Address",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"line1\": \"456 Updated Street\",\n  \"zipcode\": \"10002\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/addresses/my-addresses/1", "host": ["{{baseUrl}}"], "path": ["api", "addresses", "my-addresses", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Hotels",
+      "item": [
+        {
+          "name": "Get All Hotels (Public)",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/hotels?search=&city_id=&state_id=&country_id=&star_rating=&status=active&page=1&limit=10", "host": ["{{baseUrl}}"], "path": ["api", "hotels"], "query": [{"key": "search", "value": ""}, {"key": "city_id", "value": ""}, {"key": "state_id", "value": ""}, {"key": "country_id", "value": ""}, {"key": "star_rating", "value": ""}, {"key": "status", "value": "active"}, {"key": "page", "value": "1"}, {"key": "limit", "value": "10"}]}
+          }
+        },
+        {
+          "name": "Create Hotel (Auth Required)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Grand Plaza Hotel\",\n  \"slug\": \"grand-plaza-hotel\",\n  \"description\": \"Luxury hotel in downtown area with modern amenities\",\n  \"star_rating\": 5,\n  \"address\": {\n    \"country_id\": 1,\n    \"state_id\": 1,\n    \"city_id\": 1,\n    \"line1\": \"123 Main Street\",\n    \"zipcode\": \"10001\"\n  },\n  \"policy\": {\n    \"checkin_time\": \"15:00\",\n    \"checkout_time\": \"11:00\",\n    \"cancellation_policy\": \"24 hours before check-in\"\n  }\n}"},
+            "url": {"raw": "{{baseUrl}}/api/hotels", "host": ["{{baseUrl}}"], "path": ["api", "hotels"]}
+          }
+        },
+        {
+          "name": "Get My Hotels (Auth Required)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/hotels/my-hotels", "host": ["{{baseUrl}}"], "path": ["api", "hotels", "my-hotels"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Get My Bookings",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/bookings/my-bookings", "host": ["{{baseUrl}}"], "path": ["api", "bookings", "my-bookings"]}
+          }
+        },
+        {
+          "name": "Create Booking (Enterprise)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Idempotency-Key", "value": "booking-{{$randomUUID}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hotel_id\": 1,\n  \"room_type_id\": 1,\n  \"check_in\": \"2025-12-25\",\n  \"check_out\": \"2025-12-26\",\n  \"guests\": 2\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/bookings", "host": ["{{baseUrl}}"], "path": ["api", "bookings"]}
+          },
+          "description": "Enterprise booking with atomic transactions, price calculation, taxes, and idempotency"
+        },
+        {
+          "name": "Get Booking by ID",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/bookings/1", "host": ["{{baseUrl}}"], "path": ["api", "bookings", "1"]}
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/bookings/1/cancel", "host": ["{{baseUrl}}"], "path": ["api", "bookings", "1", "cancel"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Room Types",
+      "item": [
+        {
+          "name": "Get All Room Types",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/room-types", "host": ["{{baseUrl}}"], "path": ["api", "room-types"]}
+          }
+        },
+        {
+          "name": "Create Room Type (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Deluxe Room\",\n  \"description\": \"Spacious room with city view\",\n  \"base_price\": 150.00,\n  \"max_occupancy\": 2\n}"},
+            "url": {"raw": "{{baseUrl}}/api/room-types", "host": ["{{baseUrl}}"], "path": ["api", "room-types"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rooms",
+      "item": [
+        {
+          "name": "Get All Rooms",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/rooms?hotel_id=1&status=AVAILABLE", "host": ["{{baseUrl}}"], "path": ["api", "rooms"], "query": [{"key": "hotel_id", "value": "1"}, {"key": "status", "value": "AVAILABLE"}]}
+          }
+        },
+        {
+          "name": "Create Room (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"hotel_id\": 1,\n  \"room_type_id\": 1,\n  \"room_number\": \"101\",\n  \"floor\": 1,\n  \"status\": \"AVAILABLE\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/rooms", "host": ["{{baseUrl}}"], "path": ["api", "rooms"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Room Pricing",
+      "item": [
+        {
+          "name": "Get Room Pricing",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/room-pricing?room_type_id=1", "host": ["{{baseUrl}}"], "path": ["api", "room-pricing"], "query": [{"key": "room_type_id", "value": "1"}]}
+          }
+        },
+        {
+          "name": "Create Room Pricing (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"room_type_id\": 1,\n  \"currency_id\": 1,\n  \"price_per_night\": 150.00,\n  \"weekend_price\": 180.00\n}"},
+            "url": {"raw": "{{baseUrl}}/api/room-pricing", "host": ["{{baseUrl}}"], "path": ["api", "room-pricing"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Room Availability",
+      "item": [
+        {
+          "name": "Check Availability",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/room-availability?hotel_id=1&check_in=2024-01-01&check_out=2024-01-03&guests=2", "host": ["{{baseUrl}}"], "path": ["api", "room-availability"], "query": [{"key": "hotel_id", "value": "1"}, {"key": "check_in", "value": "2024-01-01"}, {"key": "check_out", "value": "2024-01-03"}, {"key": "guests", "value": "2"}]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Hotel Images",
+      "item": [
+        {
+          "name": "Get Hotel Images",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/hotel-images/hotel/1", "host": ["{{baseUrl}}"], "path": ["api", "hotel-images", "hotel", "1"]}
+          }
+        },
+        {
+          "name": "Upload Hotel Image (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"hotel_id\": 1,\n  \"image_url\": \"https://example.com/image.jpg\",\n  \"alt_text\": \"Hotel room view\",\n  \"display_order\": 1\n}"},
+            "url": {"raw": "{{baseUrl}}/api/hotel-images", "host": ["{{baseUrl}}"], "path": ["api", "hotel-images"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Hotel Amenities",
+      "item": [
+        {
+          "name": "Get Hotel Amenities",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/hotel-amenities/hotel/1", "host": ["{{baseUrl}}"], "path": ["api", "hotel-amenities", "hotel", "1"]}
+          }
+        },
+        {
+          "name": "Add Hotel Amenity (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"hotel_id\": 1,\n  \"amenity_id\": 1\n}"},
+            "url": {"raw": "{{baseUrl}}/api/hotel-amenities", "host": ["{{baseUrl}}"], "path": ["api", "hotel-amenities"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Hotel Facilities",
+      "item": [
+        {
+          "name": "Get Hotel Facilities",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/hotel-facilities/hotel/1", "host": ["{{baseUrl}}"], "path": ["api", "hotel-facilities", "hotel", "1"]}
+          }
+        },
+        {
+          "name": "Add Hotel Facility (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"hotel_id\": 1,\n  \"facility_id\": 1\n}"},
+            "url": {"raw": "{{baseUrl}}/api/hotel-facilities", "host": ["{{baseUrl}}"], "path": ["api", "hotel-facilities"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Create Payment",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"booking_id\": 1,\n  \"amount\": 300.00,\n  \"currency_id\": 1,\n  \"method_id\": 1,\n  \"status\": \"PENDING\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/payments", "host": ["{{baseUrl}}"], "path": ["api", "payments"]}
+          }
+        },
+        {
+          "name": "Get Payment by ID",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/payments/1", "host": ["{{baseUrl}}"], "path": ["api", "payments", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Booking Payments",
+      "item": [
+        {
+          "name": "Get All Booking Payments",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/booking-payments", "host": ["{{baseUrl}}"], "path": ["api", "booking-payments"]}
+          }
+        },
+        {
+          "name": "Get Booking Payment by ID",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/booking-payments/1", "host": ["{{baseUrl}}"], "path": ["api", "booking-payments", "1"]}
+          }
+        },
+        {
+          "name": "Get Booking Payments by Booking",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/booking-payments/booking/1", "host": ["{{baseUrl}}"], "path": ["api", "booking-payments", "booking", "1"]}
+          }
+        },
+        {
+          "name": "Get Payment Summary by Booking",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/booking-payments/booking/1/summary", "host": ["{{baseUrl}}"], "path": ["api", "booking-payments", "booking", "1", "summary"]}
+          }
+        },
+        {
+          "name": "Get Booking Payments by Status",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/booking-payments/status/pending", "host": ["{{baseUrl}}"], "path": ["api", "booking-payments", "status", "pending"]}
+          }
+        },
+        {
+          "name": "Get Booking Payments by User",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/booking-payments/user/1", "host": ["{{baseUrl}}"], "path": ["api", "booking-payments", "user", "1"]}
+          }
+        },
+        {
+          "name": "Create Booking Payment",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"booking_id\": 1,\n  \"payment_id\": 1,\n  \"status\": \"pending\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/booking-payments", "host": ["{{baseUrl}}"], "path": ["api", "booking-payments"]}
+          }
+        },
+        {
+          "name": "Update Booking Payment Status (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"status\": \"completed\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/booking-payments/1/status", "host": ["{{baseUrl}}"], "path": ["api", "booking-payments", "1", "status"]}
+          }
+        },
+        {
+          "name": "Process Payment Refund (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"refundAmount\": 100.00\n}"},
+            "url": {"raw": "{{baseUrl}}/api/booking-payments/1/refund", "host": ["{{baseUrl}}"], "path": ["api", "booking-payments", "1", "refund"]}
+          }
+        },
+        {
+          "name": "Delete Booking Payment (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/booking-payments/1", "host": ["{{baseUrl}}"], "path": ["api", "booking-payments", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Get Hotel Reviews",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/reviews/hotel/1", "host": ["{{baseUrl}}"], "path": ["api", "reviews", "hotel", "1"]}
+          }
+        },
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"hotel_id\": 1,\n  \"booking_id\": 1,\n  \"rating\": 5,\n  \"comment\": \"Excellent stay!\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/reviews", "host": ["{{baseUrl}}"], "path": ["api", "reviews"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get My Notifications",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/notifications/user/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api", "notifications", "user", "{{userId}}"]}
+          }
+        },
+        {
+          "name": "Create Notification (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"user_id\": 1,\n  \"type\": \"booking_confirmation\",\n  \"title\": \"Booking Confirmed\",\n  \"message\": \"Your booking has been confirmed\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/notifications", "host": ["{{baseUrl}}"], "path": ["api", "notifications"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Audit Logs",
+      "item": [
+        {
+          "name": "Get Audit Logs (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/audit-logs", "host": ["{{baseUrl}}"], "path": ["api", "audit-logs"]}
+          }
+        },
+        {
+          "name": "Get User Audit Logs (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/audit-logs/user/1", "host": ["{{baseUrl}}"], "path": ["api", "audit-logs", "user", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transaction Logs",
+      "item": [
+        {
+          "name": "Get Transaction Logs (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/transaction-logs", "host": ["{{baseUrl}}"], "path": ["api", "transaction-logs"]}
+          }
+        },
+        {
+          "name": "Get Payment Transaction Logs (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/transaction-logs/payment/1", "host": ["{{baseUrl}}"], "path": ["api", "transaction-logs", "payment", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Countries",
+      "item": [
+        {
+          "name": "Get All Countries",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/countries", "host": ["{{baseUrl}}"], "path": ["api", "countries"]}
+          }
+        },
+        {
+          "name": "Create Country (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"United States\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/countries", "host": ["{{baseUrl}}"], "path": ["api", "countries"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "States",
+      "item": [
+        {
+          "name": "Get States by Country",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/states/country/1", "host": ["{{baseUrl}}"], "path": ["api", "states", "country", "1"]}
+          }
+        },
+        {
+          "name": "Create State (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"country_id\": 1,\n  \"name\": \"California\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/states", "host": ["{{baseUrl}}"], "path": ["api", "states"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cities",
+      "item": [
+        {
+          "name": "Get Cities by State",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/cities/state/1", "host": ["{{baseUrl}}"], "path": ["api", "cities", "state", "1"]}
+          }
+        },
+        {
+          "name": "Create City (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"state_id\": 1,\n  \"name\": \"Los Angeles\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/cities", "host": ["{{baseUrl}}"], "path": ["api", "cities"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Currencies",
+      "item": [
+        {
+          "name": "Get All Currencies",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/currencies", "host": ["{{baseUrl}}"], "path": ["api", "currencies"]}
+          }
+        },
+        {
+          "name": "Create Currency (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"code\": \"USD\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/currencies", "host": ["{{baseUrl}}"], "path": ["api", "currencies"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payment Methods",
+      "item": [
+        {
+          "name": "Get All Payment Methods",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/payment-methods", "host": ["{{baseUrl}}"], "path": ["api", "payment-methods"]}
+          }
+        },
+        {
+          "name": "Get Active Payment Methods",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/payment-methods/active", "host": ["{{baseUrl}}"], "path": ["api", "payment-methods", "active"]}
+          }
+        },
+        {
+          "name": "Get Payment Methods Stats",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/payment-methods/stats", "host": ["{{baseUrl}}"], "path": ["api", "payment-methods", "stats"]}
+          }
+        },
+        {
+          "name": "Search Payment Methods",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/payment-methods/search?q=credit", "host": ["{{baseUrl}}"], "path": ["api", "payment-methods", "search"], "query": [{"key": "q", "value": "credit"}]}
+          }
+        },
+        {
+          "name": "Get Payment Method by ID",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/payment-methods/1", "host": ["{{baseUrl}}"], "path": ["api", "payment-methods", "1"]}
+          }
+        },
+        {
+          "name": "Get Payment Method by Name",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/payment-methods/name/Credit%20Card", "host": ["{{baseUrl}}"], "path": ["api", "payment-methods", "name", "Credit Card"]}
+          }
+        },
+        {
+          "name": "Get Payment Methods by Provider",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/payment-methods/provider/Visa", "host": ["{{baseUrl}}"], "path": ["api", "payment-methods", "provider", "Visa"]}
+          }
+        },
+        {
+          "name": "Create Payment Method (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Credit Card\",\n  \"provider\": \"Visa\",\n  \"active\": true\n}"},
+            "url": {"raw": "{{baseUrl}}/api/payment-methods", "host": ["{{baseUrl}}"], "path": ["api", "payment-methods"]}
+          }
+        },
+        {
+          "name": "Update Payment Method (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Credit Card\",\n  \"provider\": \"Visa\",\n  \"active\": true\n}"},
+            "url": {"raw": "{{baseUrl}}/api/payment-methods/1", "host": ["{{baseUrl}}"], "path": ["api", "payment-methods", "1"]}
+          }
+        },
+        {
+          "name": "Delete Payment Method (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/payment-methods/1", "host": ["{{baseUrl}}"], "path": ["api", "payment-methods", "1"]}
+          }
+        },
+        {
+          "name": "Activate Payment Method (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/payment-methods/1/activate", "host": ["{{baseUrl}}"], "path": ["api", "payment-methods", "1", "activate"]}
+          }
+        },
+        {
+          "name": "Deactivate Payment Method (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/payment-methods/1/deactivate", "host": ["{{baseUrl}}"], "path": ["api", "payment-methods", "1", "deactivate"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Room Locks (Enterprise)",
+      "item": [
+        {
+          "name": "Lock Room",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hotel_id\": 1,\n  \"room_id\": 1,\n  \"lock_type\": \"BOOKING\",\n  \"locked_until\": \"2024-12-25T10:00:00Z\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/room-locks/lock", "host": ["{{baseUrl}}"], "path": ["api", "room-locks", "lock"]}
+          }
+        },
+        {
+          "name": "Release Room Lock",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/room-locks/release/1", "host": ["{{baseUrl}}"], "path": ["api", "room-locks", "release", "1"]}
+          }
+        },
+        {
+          "name": "Get Hotel Room Locks",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/room-locks/hotel/1", "host": ["{{baseUrl}}"], "path": ["api", "room-locks", "hotel", "1"]}
+          }
+        },
+        {
+          "name": "Clean Up Expired Locks",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": {"raw": "{{baseUrl}}/api/room-locks/cleanup", "host": ["{{baseUrl}}"], "path": ["api", "room-locks", "cleanup"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pricing Rules (Enterprise)",
+      "item": [
+        {
+          "name": "Create Pricing Rule",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hotel_id\": 1,\n  \"room_type_id\": 1,\n  \"rule_name\": \"Weekend Surcharge\",\n  \"rule_type\": \"WEEKEND\",\n  \"percentage_change\": 20,\n  \"priority\": 1\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/pricing-rules", "host": ["{{baseUrl}}"], "path": ["api", "pricing-rules"]}
+          }
+        },
+        {
+          "name": "Get Hotel Pricing Rules",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/pricing-rules/hotel/1", "host": ["{{baseUrl}}"], "path": ["api", "pricing-rules", "hotel", "1"]}
+          }
+        },
+        {
+          "name": "Get Applicable Pricing Rules",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/pricing-rules/applicable?hotel_id=1&room_type_id=1&check_in=2024-12-25&check_out=2024-12-26", "host": ["{{baseUrl}}"], "path": ["api", "pricing-rules", "applicable"], "query": [{"key": "hotel_id", "value": "1"}, {"key": "room_type_id", "value": "1"}, {"key": "check_in", "value": "2024-12-25"}, {"key": "check_out", "value": "2024-12-26"}]}
+          }
+        },
+        {
+          "name": "Update Pricing Rule",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rule_name\": \"Updated Weekend Surcharge\",\n  \"percentage_change\": 25,\n  \"is_active\": true\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/pricing-rules/1", "host": ["{{baseUrl}}"], "path": ["api", "pricing-rules", "1"]}
+          }
+        },
+        {
+          "name": "Delete Pricing Rule",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/pricing-rules/1", "host": ["{{baseUrl}}"], "path": ["api", "pricing-rules", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Refunds (Enterprise)",
+      "item": [
+        {
+          "name": "Create Refund",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": 1,\n  \"payment_id\": 1,\n  \"amount\": 100.00,\n  \"reason\": \"Customer requested cancellation\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/refunds", "host": ["{{baseUrl}}"], "path": ["api", "refunds"]}
+          }
+        },
+        {
+          "name": "Get Booking Refunds",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/refunds/booking/1", "host": ["{{baseUrl}}"], "path": ["api", "refunds", "booking", "1"]}
+          }
+        },
+        {
+          "name": "Process Refund (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PROCESSED\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/refunds/1/process", "host": ["{{baseUrl}}"], "path": ["api", "refunds", "1", "process"]}
+          }
+        },
+        {
+          "name": "Get All Refunds (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/refunds/admin/all?page=1&limit=20", "host": ["{{baseUrl}}"], "path": ["api", "refunds", "admin", "all"], "query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "20"}]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Refund Policies (Enterprise)",
+      "item": [
+        {
+          "name": "Create Refund Policy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hotel_id\": 1,\n  \"hours_before_checkin\": 24,\n  \"refund_percentage\": 100\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/refund-policies", "host": ["{{baseUrl}}"], "path": ["api", "refund-policies"]}
+          }
+        },
+        {
+          "name": "Get Hotel Refund Policies",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/refund-policies/hotel/1", "host": ["{{baseUrl}}"], "path": ["api", "refund-policies", "hotel", "1"]}
+          }
+        },
+        {
+          "name": "Calculate Refund Amount",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hotel_id\": 1,\n  \"booking_amount\": 200.00,\n  \"check_in_date\": \"2024-12-25T14:00:00Z\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/refund-policies/calculate", "host": ["{{baseUrl}}"], "path": ["api", "refund-policies", "calculate"]}
+          }
+        },
+        {
+          "name": "Update Refund Policy",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hours_before_checkin\": 48,\n  \"refund_percentage\": 50\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/refund-policies/1", "host": ["{{baseUrl}}"], "path": ["api", "refund-policies", "1"]}
+          }
+        },
+        {
+          "name": "Delete Refund Policy",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/refund-policies/1", "host": ["{{baseUrl}}"], "path": ["api", "refund-policies", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payment Gateways (Enterprise)",
+      "item": [
+        {
+          "name": "Create Payment Gateway",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Razorpay\",\n  \"provider\": \"razorpay\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/payment-gateways", "host": ["{{baseUrl}}"], "path": ["api", "payment-gateways"]}
+          }
+        },
+        {
+          "name": "Get All Payment Gateways",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/payment-gateways", "host": ["{{baseUrl}}"], "path": ["api", "payment-gateways"]}
+          }
+        },
+        {
+          "name": "Get Active Payment Gateways",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/payment-gateways/active", "host": ["{{baseUrl}}"], "path": ["api", "payment-gateways", "active"]}
+          }
+        },
+        {
+          "name": "Update Payment Gateway",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Razorpay\",\n  \"provider\": \"razorpay\",\n  \"is_active\": true\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/payment-gateways/1", "host": ["{{baseUrl}}"], "path": ["api", "payment-gateways", "1"]}
+          }
+        },
+        {
+          "name": "Toggle Gateway Status",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/payment-gateways/1/toggle", "host": ["{{baseUrl}}"], "path": ["api", "payment-gateways", "1", "toggle"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payment Transactions (Enterprise)",
+      "item": [
+        {
+          "name": "Create Payment Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payment_id\": 1,\n  \"gateway_id\": 1,\n  \"gateway_transaction_id\": \"txn_123456\",\n  \"request_payload\": {\"amount\": 1000},\n  \"response_payload\": {\"status\": \"success\"},\n  \"status\": \"SUCCESS\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/payment-transactions", "host": ["{{baseUrl}}"], "path": ["api", "payment-transactions"]}
+          }
+        },
+        {
+          "name": "Get Payment Transactions",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/payment-transactions/payment/1", "host": ["{{baseUrl}}"], "path": ["api", "payment-transactions", "payment", "1"]}
+          }
+        },
+        {
+          "name": "Get All Transactions (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/payment-transactions/admin/all?page=1&limit=20", "host": ["{{baseUrl}}"], "path": ["api", "payment-transactions", "admin", "all"], "query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "20"}]}
+          }
+        },
+        {
+          "name": "Get Transaction Details",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/payment-transactions/1", "host": ["{{baseUrl}}"], "path": ["api", "payment-transactions", "1"]}
+          }
+        },
+        {
+          "name": "Update Transaction Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PROCESSED\",\n  \"response_payload\": {\"updated\": true}\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/payment-transactions/1/status", "host": ["{{baseUrl}}"], "path": ["api", "payment-transactions", "1", "status"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Price Calculation (Enterprise)",
+      "item": [
+        {
+          "name": "Calculate Price",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hotel_id\": 1,\n  \"room_type_id\": 1,\n  \"check_in\": \"2025-12-25\",\n  \"check_out\": \"2025-12-26\",\n  \"guests\": 2\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/price-calculation/calculate", "host": ["{{baseUrl}}"], "path": ["api", "price-calculation", "calculate"]}
+          },
+          "description": "Backend-only price calculation with dynamic pricing rules"
+        },
+        {
+          "name": "Validate Price Integrity",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/price-calculation/validate/1", "host": ["{{baseUrl}}"], "path": ["api", "price-calculation", "validate", "1"]}
+          },
+          "description": "Validate booking price integrity"
+        }
+      ]
+    },
+    {
+      "name": "Tax Calculation (Enterprise)",
+      "item": [
+        {
+          "name": "Calculate Taxes and Fees",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"base_amount\": 100.00,\n  \"hotel_id\": 1,\n  \"booking_date\": \"2025-12-23T00:00:00Z\",\n  \"check_in_date\": \"2025-12-25T00:00:00Z\",\n  \"check_out_date\": \"2025-12-26T00:00:00Z\",\n  \"room_type_id\": 1,\n  \"guests\": 2\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/tax-calculation/calculate", "host": ["{{baseUrl}}"], "path": ["api", "tax-calculation", "calculate"]}
+          },
+          "description": "Calculate taxes and service fees for booking"
+        },
+        {
+          "name": "Generate Tax Invoice",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/tax-calculation/invoice/1", "host": ["{{baseUrl}}"], "path": ["api", "tax-calculation", "invoice", "1"]}
+          },
+          "description": "Generate tax invoice for booking"
+        }
+      ]
+    },
+    {
+      "name": "System Metrics (Enterprise)",
+      "item": [
+        {
+          "name": "Get All System Metrics",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/api/system-metrics", "host": ["{{baseUrl}}"], "path": ["api", "system-metrics"]}
+          },
+          "description": "Get system performance metrics"
+        },
+        {
+          "name": "Create System Metric",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"metric_key\": \"booking_success_rate\",\n  \"metric_value\": \"95.5\",\n  \"recorded_at\": \"2025-12-23T00:00:00Z\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/system-metrics", "host": ["{{baseUrl}}"], "path": ["api", "system-metrics"]}
+          },
+          "description": "Create system metric entry"
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:3000"},
+    {"key": "token", "value": ""},
+    {"key": "userId", "value": ""},
+    {"key": "userRole", "value": ""}
+  ]
+}

@@ -1,0 +1,1026 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Module 1 — Users (7 Tables)
+model User {
+  id                    Int                    @id @default(autoincrement())
+  name                  String
+  email                 String                 @unique
+  password_hash         String
+  phone                 String?
+  role_id               Int
+  is_active             Boolean                @default(true)
+  created_at            DateTime               @default(now())
+  updated_at            DateTime               @updatedAt
+  
+  // Relations
+  role                  Role                   @relation(fields: [role_id], references: [id])
+  user_sessions         UserSession[]
+  user_addresses        UserAddress[]
+  user_verification_tokens UserVerificationToken[]
+  password_reset_tokens PasswordResetToken[]
+  owned_hotels          Hotel[]                @relation("HotelOwner")
+  hotel_staff           HotelStaff[]
+  booking_status_logs   BookingStatusLog[] @relation("BookingStatusChanger")
+  review_replies        ReviewReply[]
+  notifications         Notification[]
+  audit_logs            AuditLog[]
+  bookings             Booking[] @relation("UserBookings")
+  reviews               Review[] @relation("UserReviews")
+  room_locks            RoomLock[]
+  room_status_logs      RoomStatusLog[]
+  api_rate_limits       ApiRateLimit[]
+  soft_delete_logs      SoftDeleteLog[]
+  
+  @@map("users")
+}
+
+model Role {
+  id          Int              @id @default(autoincrement())
+  name        String           @unique
+  created_at  DateTime         @default(now())
+  
+  // Relations
+  users       User[]
+  role_permissions RolePermission[]
+  
+  @@map("roles")
+}
+
+model Permission {
+  id          Int              @id @default(autoincrement())
+  name        String           @unique
+  description String?
+  
+  // Relations
+  role_permissions RolePermission[]
+  
+  @@map("permissions")
+}
+
+model RolePermission {
+  id            Int @id @default(autoincrement())
+  role_id       Int
+  permission_id Int
+  
+  // Relations
+  role          Role       @relation(fields: [role_id], references: [id])
+  permission    Permission @relation(fields: [permission_id], references: [id])
+  
+  @@unique([role_id, permission_id])
+  @@map("role_permissions")
+}
+
+model UserSession {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  ip_address  String
+  user_agent  String
+  expires_at  DateTime
+  created_at  DateTime @default(now())
+  
+  // Relations
+  user        User     @relation(fields: [user_id], references: [id])
+  
+  @@map("user_sessions")
+}
+
+model UserAddress {
+  id        Int @id @default(autoincrement())
+  user_id   Int
+  country_id Int
+  state_id  Int
+  city_id   Int
+  line1     String
+  zipcode   String
+  created_at DateTime @default(now())
+  
+  // Relations
+  user      User @relation(fields: [user_id], references: [id])
+  country   Country @relation(fields: [country_id], references: [id])
+  state     State @relation(fields: [state_id], references: [id])
+  city      City @relation(fields: [city_id], references: [id])
+  
+  @@map("user_addresses")
+}
+
+model UserVerificationToken {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  token      String   @unique
+  expires_at DateTime
+  created_at DateTime @default(now())
+  
+  // Relations
+  user       User     @relation(fields: [user_id], references: [id])
+  
+  @@map("user_verification_tokens")
+}
+
+// Module 2 — Hotels (9 Tables)
+model Hotel {
+  id          Int      @id @default(autoincrement())
+  owner_id    Int
+  name        String
+  slug        String   @unique
+  description String?
+  star_rating Int      @default(1)
+  status      String   @default("active") // active/inactive
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  
+  // Relations
+  owner       User              @relation("HotelOwner", fields: [owner_id], references: [id])
+  hotel_address HotelAddress?
+  hotel_amenities HotelAmenity[]
+  hotel_staff   HotelStaff[]
+  hotel_policy  HotelPolicy?
+  hotel_images  HotelImage[]
+  hotel_facilities HotelFacility[]
+  room_types    RoomType[]
+  reviews       Review[] @relation("HotelReviews")
+  bookings      Booking[] @relation("HotelBookings")
+  hotel_statistics HotelStatistic[]
+  service_catalog ServiceCatalog[]
+  room_locks    RoomLock[]
+  pricing_rules PricingRule[]
+  fees          Fee[]
+  refund_policies RefundPolicy[]
+  
+  @@map("hotels")
+}
+
+model HotelAddress {
+  id         Int @id @default(autoincrement())
+  hotel_id   Int @unique
+  country_id Int
+  state_id  Int
+  city_id   Int
+  line1     String
+  zipcode   String
+  
+  // Relations
+  hotel      Hotel    @relation(fields: [hotel_id], references: [id])
+  country   Country @relation(fields: [country_id], references: [id])
+  state     State @relation(fields: [state_id], references: [id])
+  city      City @relation(fields: [city_id], references: [id])
+  
+  @@map("hotel_address")
+}
+
+model HotelAmenity {
+  id         Int @id @default(autoincrement())
+  hotel_id   Int
+  amenity_id Int
+  
+  // Relations
+  hotel      Hotel         @relation(fields: [hotel_id], references: [id])
+  amenity    AmenitiesMaster @relation(fields: [amenity_id], references: [id])
+  
+  @@unique([hotel_id, amenity_id])
+  @@map("hotel_amenities")
+}
+
+model AmenitiesMaster {
+  id          Int    @id @default(autoincrement())
+  name        String @unique
+  icon        String?
+  description String?
+  
+  // Relations
+  hotel_amenities HotelAmenity[]
+  room_amenities  RoomAmenity[]
+  
+  @@map("amenities_master")
+}
+
+model HotelStaff {
+  id          Int      @id @default(autoincrement())
+  hotel_id    Int
+  user_id     Int
+  role        String   // manager, receptionist
+  assigned_at DateTime @default(now())
+  
+  // Relations
+  hotel       Hotel @relation(fields: [hotel_id], references: [id])
+  user        User  @relation(fields: [user_id], references: [id])
+  
+  @@unique([hotel_id, user_id])
+  @@map("hotel_staff")
+}
+
+model HotelPolicy {
+  id                  Int      @id @default(autoincrement())
+  hotel_id            Int      @unique
+  checkin_time        String   @default("14:00")
+  checkout_time       String   @default("11:00")
+  cancellation_policy String?
+  
+  // Relations
+  hotel               Hotel    @relation(fields: [hotel_id], references: [id])
+  
+  @@map("hotel_policy")
+}
+
+model HotelImage {
+  id        Int      @id @default(autoincrement())
+  hotel_id  Int
+  image_url String
+  is_primary Boolean @default(false)
+  
+  // Relations
+  hotel     Hotel    @relation(fields: [hotel_id], references: [id])
+  
+  @@map("hotel_images")
+}
+
+model HotelFacility {
+  id         Int @id @default(autoincrement())
+  hotel_id   Int
+  facility_id Int
+  
+  // Relations
+  hotel      Hotel           @relation(fields: [hotel_id], references: [id])
+  facility   FacilitiesMaster @relation(fields: [facility_id], references: [id])
+  
+  @@unique([hotel_id, facility_id])
+  @@map("hotel_facilities")
+}
+
+model FacilitiesMaster {
+  id          Int    @id @default(autoincrement())
+  name        String @unique
+  icon        String?
+  description String?
+  
+  // Relations
+  hotel_facilities HotelFacility[]
+  
+  @@map("facilities_master")
+}
+
+// Module 3 — Rooms (9 Tables)
+model RoomType {
+  id          Int      @id @default(autoincrement())
+  hotel_id    Int
+  name        String
+  description String?
+  max_guests  Int      @default(1)
+  base_price  Decimal  @db.Decimal(10, 2)
+  
+  // Relations
+  hotel       Hotel             @relation(fields: [hotel_id], references: [id])
+  rooms       Room[]
+  room_bed_types RoomBedType[]
+  room_amenities RoomAmenity[]
+  room_images  RoomImage[]
+  room_pricing RoomPricing[]
+  room_availability RoomAvailability[]
+  room_offers RoomOffer[]
+  bookings    Booking[]
+  pricing_rules PricingRule[]
+  
+  @@map("room_types")
+}
+
+model Room {
+  id           Int    @id @default(autoincrement())
+  room_type_id Int
+  room_number  String
+  floor        Int?    // Changed from String to Int
+  status       String @default("available") // available/maintenance
+  
+  // Relations
+  room_type    RoomType @relation(fields: [room_type_id], references: [id])
+  room_locks   RoomLock[]
+  room_status_logs RoomStatusLog[]
+  
+  @@unique([room_type_id, room_number])
+  @@map("rooms")
+}
+
+model RoomBedType {
+  id           Int @id @default(autoincrement())
+  room_type_id Int
+  bed_type_id  Int
+  count        Int
+  
+  // Relations
+  room_type    RoomType  @relation(fields: [room_type_id], references: [id])
+  bed_type     BedsMaster @relation(fields: [bed_type_id], references: [id])
+  
+  @@unique([room_type_id, bed_type_id])
+  @@map("room_bed_types")
+}
+
+model BedsMaster {
+  id   Int    @id @default(autoincrement())
+  name String @unique // King, Queen, Single
+  icon String?
+  
+  // Relations
+  room_bed_types RoomBedType[]
+  
+  @@map("beds_master")
+}
+
+model RoomAmenity {
+  id           Int @id @default(autoincrement())
+  room_type_id Int
+  amenity_id   Int
+  
+  // Relations
+  room_type    RoomType        @relation(fields: [room_type_id], references: [id])
+  amenity      AmenitiesMaster @relation(fields: [amenity_id], references: [id])
+  
+  @@unique([room_type_id, amenity_id])
+  @@map("room_amenities")
+}
+
+model RoomImage {
+  id           Int      @id @default(autoincrement())
+  room_type_id Int
+  image_url    String
+  is_primary   Boolean  @default(false)
+  
+  // Relations
+  room_type    RoomType @relation(fields: [room_type_id], references: [id])
+  
+  @@map("room_images")
+}
+
+model RoomPricing {
+  id           Int      @id @default(autoincrement())
+  room_type_id Int
+  date_from    DateTime
+  date_to      DateTime
+  price        Decimal  @db.Decimal(10, 2)
+  currency_id  Int
+  
+  // Relations
+  room_type    RoomType @relation(fields: [room_type_id], references: [id])
+  currency     Currency @relation(fields: [currency_id], references: [id])
+  
+  @@map("room_pricing")
+}
+
+model RoomAvailability {
+  id              Int      @id @default(autoincrement())
+  room_type_id    Int
+  date            DateTime @db.Date
+  total_rooms     Int
+  available_rooms Int
+  
+  // Relations
+  room_type       RoomType @relation(fields: [room_type_id], references: [id])
+  
+  @@unique([room_type_id, date])
+  @@map("room_availability")
+}
+
+model RoomOffer {
+  id               Int      @id @default(autoincrement())
+  room_type_id     Int
+  title            String
+  discount_percent Int
+  valid_from       DateTime
+  valid_to         DateTime
+  
+  // Relations
+  room_type        RoomType @relation(fields: [room_type_id], references: [id])
+  
+  @@map("room_offers")
+}
+
+// Module 4 — Bookings (6 Tables)
+model Booking {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  hotel_id     Int
+  room_type_id Int
+  check_in     DateTime @db.Date
+  check_out    DateTime @db.Date
+  total_amount Decimal  @db.Decimal(10, 2)
+  status       String   @default("pending") // pending/confirmed/cancelled
+  version      Int      @default(1) // for optimistic locking
+  created_at   DateTime @default(now())
+  
+  // Relations
+  user         User              @relation("UserBookings", fields: [user_id], references: [id])
+  hotel        Hotel             @relation("HotelBookings", fields: [hotel_id], references: [id])
+  room_type    RoomType          @relation(fields: [room_type_id], references: [id])
+  booking_payments BookingPayment[]
+  booking_status_logs BookingStatusLog[]
+  booking_refunds BookingRefund[]
+  booking_guests BookingGuest[]
+  booking_invoices BookingInvoice[]
+  payments      Payment[]
+  booking_taxes BookingTax[]
+  booking_services BookingService[]
+  room_locks   RoomLock[]
+  refunds      Refund[]
+  
+  @@map("bookings")
+}
+
+model BookingPayment {
+  id          Int      @id @default(autoincrement())
+  booking_id  Int
+  payment_id  Int
+  status      String
+  created_at  DateTime @default(now())
+  
+  // Relations
+  booking     Booking @relation(fields: [booking_id], references: [id])
+  payment     Payment @relation(fields: [payment_id], references: [id])
+  
+  @@map("booking_payments")
+}
+
+model BookingStatusLog {
+  id          Int      @id @default(autoincrement())
+  booking_id  Int
+  from_status String
+  to_status   String
+  changed_by  Int
+  changed_at  DateTime @default(now())
+  note        String?
+  
+  // Relations
+  booking     Booking @relation(fields: [booking_id], references: [id])
+  changed_by_user User @relation("BookingStatusChanger", fields: [changed_by], references: [id])
+  
+  @@map("booking_status_logs")
+}
+
+model BookingRefund {
+  id            Int      @id @default(autoincrement())
+  booking_id    Int
+  amount        Decimal  @db.Decimal(10, 2)
+  reason        String?
+  refund_status String
+  created_at    DateTime @default(now())
+  
+  // Relations
+  booking       Booking @relation(fields: [booking_id], references: [id])
+  
+  @@map("booking_refunds")
+}
+
+model BookingGuest {
+  id              Int @id @default(autoincrement())
+  booking_id      Int
+  full_name       String
+  age             Int
+  document_number String?
+  
+  // Relations
+  booking         Booking @relation(fields: [booking_id], references: [id])
+  
+  @@map("booking_guests")
+}
+
+model BookingInvoice {
+  id           Int      @id @default(autoincrement())
+  booking_id   Int
+  invoice_number String  @unique
+  amount       Decimal  @db.Decimal(10, 2)
+  tax          Decimal  @db.Decimal(10, 2) @default(0)
+  created_at   DateTime @default(now())
+  pdf_url      String?
+  
+  // Relations
+  booking      Booking @relation(fields: [booking_id], references: [id])
+  
+  @@map("booking_invoices")
+}
+
+// Module 5 — Payments (3 Tables)
+model Payment {
+  id             Int      @id @default(autoincrement())
+  booking_id     Int
+  amount         Decimal  @db.Decimal(10, 2)
+  currency_id    Int
+  method_id      Int
+  status         String
+  transaction_ref String?
+  created_at     DateTime @default(now())
+  
+  // Relations
+  booking        Booking          @relation(fields: [booking_id], references: [id])
+  currency       Currency         @relation(fields: [currency_id], references: [id])
+  method         PaymentMethod    @relation(fields: [method_id], references: [id])
+  booking_payments BookingPayment[]
+  transaction_logs TransactionLog[]
+  payment_transactions PaymentTransaction[]
+  refunds        Refund[]
+  
+  @@map("payments")
+}
+
+model PaymentMethod {
+  id       Int    @id @default(autoincrement())
+  name     String @unique // card, upi, netbanking
+  provider String?
+  active   Boolean @default(true)
+  
+  // Relations
+  payments Payment[]
+  
+  @@map("payment_methods")
+}
+
+model TransactionLog {
+  id           Int      @id @default(autoincrement())
+  payment_id   Int
+  status       String
+  raw_response String?
+  created_at   DateTime @default(now())
+  
+  // Relations
+  payment      Payment @relation(fields: [payment_id], references: [id])
+  
+  @@map("transaction_logs")
+}
+
+// Module 6 — Reviews (3 Tables)
+model Review {
+  id         Int      @id @default(autoincrement())
+  hotel_id   Int
+  user_id    Int
+  rating     Int
+  comment    String?
+  created_at DateTime @default(now())
+  
+  // Relations
+  hotel      Hotel         @relation("HotelReviews", fields: [hotel_id], references: [id])
+  user       User          @relation("UserReviews", fields: [user_id], references: [id])
+  review_images ReviewImage[]
+  review_replies ReviewReply[]
+  
+  @@unique([hotel_id, user_id])
+  @@map("reviews")
+}
+
+model ReviewImage {
+  id        Int    @id @default(autoincrement())
+  review_id Int
+  image_url String
+  
+  // Relations
+  review    Review @relation(fields: [review_id], references: [id])
+  
+  @@map("review_images")
+}
+
+model ReviewReply {
+  id        Int      @id @default(autoincrement())
+  review_id  Int
+  user_id   Int
+  reply     String
+  created_at DateTime @default(now())
+  
+  // Relations
+  review    Review @relation(fields: [review_id], references: [id])
+  user      User   @relation(fields: [user_id], references: [id])
+  
+  @@map("review_replies")
+}
+
+// Module 7 — Notifications (2 Tables)
+model Notification {
+  id        Int      @id @default(autoincrement())
+  user_id   Int
+  title     String
+  message   String
+  type      String
+  status    String   @default("sent") // sent/failed
+  created_at DateTime @default(now())
+  
+  // Relations
+  user      User               @relation(fields: [user_id], references: [id])
+  notification_logs NotificationLog[]
+  
+  @@map("notifications")
+}
+
+model NotificationLog {
+  id             Int      @id @default(autoincrement())
+  notification_id Int
+  status         String
+  response       String?
+  created_at     DateTime @default(now())
+  
+  // Relations
+  notification   Notification @relation(fields: [notification_id], references: [id])
+  
+  @@map("notification_logs")
+}
+
+// Module 8 — Config + Misc (5 Tables)
+model Country {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  
+  // Relations
+  states          State[]
+  user_addresses  UserAddress[]
+  hotel_addresses HotelAddress[]
+  taxes           Tax[]
+  
+  @@map("countries")
+}
+
+model State {
+  id         Int    @id @default(autoincrement())
+  country_id Int
+  name       String
+  
+  // Relations
+  country    Country          @relation(fields: [country_id], references: [id])
+  cities     City[]
+  user_addresses UserAddress[]
+  hotel_addresses HotelAddress[]
+  taxes      Tax[]
+  
+  @@unique([country_id, name])
+  @@map("states")
+}
+
+model City {
+  id       Int    @id @default(autoincrement())
+  state_id Int
+  name     String
+  
+  // Relations
+  state     State           @relation(fields: [state_id], references: [id])
+  user_addresses UserAddress[]
+  hotel_addresses HotelAddress[]
+  
+  @@unique([state_id, name])
+  @@map("cities")
+}
+
+model AppSetting {
+  id          Int    @id @default(autoincrement())
+  key         String @unique
+  value       String
+  description String?
+  
+  @@map("app_settings")
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  user_id   Int
+  action    String
+  entity    String
+  entity_id Int
+  payload   String?
+  created_at DateTime @default(now())
+  
+  // Relations
+  user      User @relation(fields: [user_id], references: [id])
+  
+  @@map("audit_logs")
+}
+
+// Additional Tables
+model PasswordResetToken {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  token      String   @unique
+  expires_at DateTime
+  used_at    DateTime?
+  created_at DateTime @default(now())
+  
+  // Relations
+  user       User @relation(fields: [user_id], references: [id])
+  
+  @@map("password_reset_tokens")
+}
+
+model HotelStatistic {
+  id             Int      @id @default(autoincrement())
+  hotel_id       Int
+  date           DateTime @db.Date
+  total_bookings Int      @default(0)
+  total_revenue  Decimal  @db.Decimal(10, 2) @default(0)
+  occupancy_rate Decimal  @db.Decimal(5, 2) @default(0)
+  created_at     DateTime @default(now())
+  
+  // Relations
+  hotel          Hotel @relation(fields: [hotel_id], references: [id])
+  
+  @@unique([hotel_id, date])
+  @@map("hotel_statistics")
+}
+
+model BookingTax {
+  id         Int     @id @default(autoincrement())
+  booking_id Int
+  tax_id     Int
+  amount     Decimal @db.Decimal(10, 2)
+  
+  // Relations
+  booking    Booking @relation(fields: [booking_id], references: [id])
+  tax        Tax     @relation(fields: [tax_id], references: [id])
+  
+  @@unique([booking_id, tax_id])
+  @@map("booking_taxes")
+}
+
+model ServiceCatalog {
+  id          Int      @id @default(autoincrement())
+  hotel_id    Int
+  name        String
+  price       Decimal  @db.Decimal(10, 2)
+  description String?
+  active      Boolean  @default(true)
+  
+  // Relations
+  hotel       Hotel           @relation(fields: [hotel_id], references: [id])
+  booking_services BookingService[]
+  
+  @@map("service_catalog")
+}
+
+model BookingService {
+  id         Int     @id @default(autoincrement())
+  booking_id Int
+  service_id Int
+  quantity   Int
+  amount     Decimal @db.Decimal(10, 2)
+  
+  // Relations
+  booking    Booking       @relation(fields: [booking_id], references: [id])
+  service    ServiceCatalog @relation(fields: [service_id], references: [id])
+  
+  @@unique([booking_id, service_id])
+  @@map("booking_services")
+}
+
+model ApiKey {
+  id        Int      @id @default(autoincrement())
+  name      String
+  key       String   @unique
+  scopes    String
+  active    Boolean  @default(true)
+  created_at DateTime @default(now())
+  
+  @@map("api_keys")
+}
+
+model BackgroundJob {
+  id          Int      @id @default(autoincrement())
+  job_type    String
+  payload     String
+  status      String
+  retry_count Int      @default(0)
+  last_error  String?
+  created_at  DateTime @default(now())
+  
+  @@map("background_jobs")
+}
+
+model Currency {
+  id   Int    @id @default(autoincrement())
+  code String @unique // USD, EUR, INR
+  
+  // Relations
+  room_pricing RoomPricing[]
+  payments     Payment[]
+  
+  @@map("currencies")
+}
+
+// CRITICAL: Prevent double booking (industry mandatory)
+model RoomLock {
+  id               Int      @id @default(autoincrement())
+  hotel_id         Int
+  room_id          Int
+  booking_id       Int?     // nullable - can be locked before booking
+  locked_by_user_id Int
+  lock_type         String   // BOOKING | PAYMENT
+  locked_at         DateTime @default(now())
+  locked_until      DateTime
+  status            String   // ACTIVE | EXPIRED | RELEASED
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+  
+  // Relations
+  hotel            Hotel @relation(fields: [hotel_id], references: [id])
+  room             Room  @relation(fields: [room_id], references: [id])
+  booking          Booking? @relation(fields: [booking_id], references: [id])
+  locked_by_user   User  @relation(fields: [locked_by_user_id], references: [id])
+  
+  @@unique([room_id, status]) // Only one active lock per room
+  @@map("room_locks")
+}
+
+// CRITICAL: Dynamic pricing (weekend, festival, demand)
+model PricingRule {
+  id               Int      @id @default(autoincrement())
+  hotel_id         Int
+  room_type_id     Int?     // nullable - can apply to entire hotel
+  rule_name        String
+  rule_type        String   // DATE_RANGE | WEEKEND | SEASON | DEMAND
+  start_date       DateTime? // nullable for WEEKEND/SEASON rules
+  end_date         DateTime? // nullable for WEEKEND/SEASON rules
+  percentage_change Decimal  @db.Decimal(5, 2) // +20%, -10%
+  priority         Int      @default(1) // higher priority wins
+  is_active        Boolean  @default(true)
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+  
+  // Relations
+  hotel            Hotel     @relation(fields: [hotel_id], references: [id])
+  room_type        RoomType? @relation(fields: [room_type_id], references: [id])
+  
+  @@map("pricing_rules")
+}
+
+// CRITICAL: GST / VAT / Service tax support
+model Tax {
+  id          Int      @id @default(autoincrement())
+  country_id  Int
+  state_id    Int?     // nullable for country-level taxes
+  name        String   // GST, VAT, Service Tax
+  percentage  Decimal  @db.Decimal(5, 2) // 18.00, 20.00
+  is_inclusive Boolean  @default(false) // included in price or added
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  
+  // Relations
+  country     Country @relation(fields: [country_id], references: [id])
+  state       State?  @relation(fields: [state_id], references: [id])
+  booking_taxes BookingTax[]
+  
+  @@map("taxes")
+}
+
+// CRITICAL: Platform & hotel service charges
+model Fee {
+  id          Int      @id @default(autoincrement())
+  hotel_id    Int?     // nullable for global platform fees
+  fee_type    String   // PLATFORM | SERVICE | CLEANING
+  amount_type String   // PERCENTAGE | FLAT
+  amount      Decimal  @db.Decimal(10, 2)
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  
+  // Relations
+  hotel       Hotel?   @relation(fields: [hotel_id], references: [id])
+  
+  @@map("fees")
+}
+
+// PAYMENT: Razorpay / Stripe abstraction
+model PaymentGateway {
+  id        Int      @id @default(autoincrement())
+  name      String   // Razorpay, Stripe, PayPal
+  provider  String   // razorpay, stripe, paypal
+  is_active Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  
+  // Relations
+  payment_transactions PaymentTransaction[]
+  
+  @@map("payment_gateways")
+}
+
+// PAYMENT: Track real gateway responses (audit safe)
+model PaymentTransaction {
+  id                    Int      @id @default(autoincrement())
+  payment_id            Int
+  gateway_id            Int
+  gateway_transaction_id String  // actual gateway transaction ID
+  request_payload       String   // JSON string
+  response_payload      String   // JSON string
+  status                String   // SUCCESS, FAILED, PENDING
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+  
+  // Relations
+  payment               Payment         @relation(fields: [payment_id], references: [id])
+  gateway               PaymentGateway  @relation(fields: [gateway_id], references: [id])
+  
+  @@map("payment_transactions")
+}
+
+// PAYMENT: Partial & policy-based refunds
+model Refund {
+  id          Int      @id @default(autoincrement())
+  booking_id  Int
+  payment_id  Int
+  amount      Decimal  @db.Decimal(10, 2)
+  reason      String?
+  status      String   // INITIATED | PROCESSED | FAILED
+  processed_at DateTime?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  
+  // Relations
+  booking     Booking @relation(fields: [booking_id], references: [id])
+  payment     Payment @relation(fields: [payment_id], references: [id])
+  
+  @@map("refunds")
+}
+
+// PAYMENT: Time-based cancellation logic
+model RefundPolicy {
+  id                 Int      @id @default(autoincrement())
+  hotel_id           Int
+  hours_before_checkin Int
+  refund_percentage  Decimal  @db.Decimal(5, 2)
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+  
+  // Relations
+  hotel              Hotel @relation(fields: [hotel_id], references: [id])
+  
+  @@map("refund_policies")
+}
+
+// ROOM LIFECYCLE: Track room state changes (audit)
+model RoomStatusLog {
+  id             Int      @id @default(autoincrement())
+  room_id        Int
+  previous_status String?
+  new_status     String
+  changed_by     Int
+  changed_at     DateTime @default(now())
+  
+  // Relations
+  room           Room  @relation(fields: [room_id], references: [id])
+  changed_by_user User @relation(fields: [changed_by], references: [id])
+  
+  @@map("room_status_logs")
+}
+
+// SYSTEM: Prevent abuse & brute force
+model ApiRateLimit {
+  id           Int      @id @default(autoincrement())
+  user_id      Int?     // nullable for anonymous requests
+  ip_address   String
+  endpoint     String
+  request_count Int     @default(0)
+  window_start DateTime @default(now())
+  window_end   DateTime
+  
+  // Relations
+  user         User?    @relation(fields: [user_id], references: [id])
+  
+  @@unique([user_id, ip_address, endpoint])
+  @@map("api_rate_limits")
+}
+
+// SYSTEM: Enterprise data safety
+model SoftDeleteLog {
+  id         Int      @id @default(autoincrement())
+  table_name String
+  record_id  BigInt
+  deleted_by Int
+  deleted_at DateTime @default(now())
+  reason     String?
+  
+  // Relations
+  deleted_by_user User @relation(fields: [deleted_by], references: [id])
+  
+  @@map("soft_delete_logs")
+}
+
+// SYSTEM: Queue system (emails, refunds)
+model Job {
+  id       Int      @id @default(autoincrement())
+  job_type String
+  payload  String   // JSON string
+  status   String   // PENDING | PROCESSING | FAILED | COMPLETED
+  attempts Int      @default(0)
+  run_at   DateTime?
+  created_at DateTime @default(now())
+  
+  @@map("jobs")
+}
+
+// SYSTEM: Monitoring & health
+model SystemMetric {
+  id          Int      @id @default(autoincrement())
+  metric_key  String
+  metric_value String
+  recorded_at DateTime @default(now())
+  
+  @@map("system_metrics")
+}
