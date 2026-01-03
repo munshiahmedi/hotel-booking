@@ -18,7 +18,6 @@ import {
   message,
   Tabs,
   Divider,
-  Upload,
   Avatar
 } from 'antd';
 import { 

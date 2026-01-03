@@ -1,5 +1,5 @@
 // src/pages/CreateBooking/CreateBookingPage.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Card, 
@@ -17,9 +17,7 @@ import {
   Divider
 } from 'antd';
 import { 
-  CalendarOutlined, 
   UserOutlined, 
-  DollarOutlined,
   ArrowLeftOutlined,
   EnvironmentOutlined,
   StarOutlined
@@ -29,7 +27,6 @@ import { hotelApi, bookingApi } from '../../services/api';
 import { useAuth } from '../../utils/AuthContext';
 
 const { Title, Text } = Typography;
-const { RangePicker } = DatePicker;
 
 interface HotelDetails {
   id: number;
@@ -58,7 +55,6 @@ interface BookingFormData {
 const CreateBookingPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { token } = useAuth();
   const [form] = Form.useForm();
   const [hotel, setHotel] = useState<HotelDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -76,13 +72,7 @@ const CreateBookingPage: React.FC = () => {
     { value: 'executive', label: 'Executive Suite', price: 349 }
   ];
 
-  useEffect(() => {
-    if (id) {
-      fetchHotelDetails();
-    }
-  }, [id]);
-
-  const fetchHotelDetails = async () => {
+  const fetchHotelDetails = useCallback(async () => {
     try {
       setLoading(true);
       const response = await hotelApi.getHotelById(id!);
@@ -100,7 +90,7 @@ const CreateBookingPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, navigate]);
 
   const calculatePrice = (checkIn: dayjs.Dayjs, checkOut: dayjs.Dayjs, rooms: number, roomType: string) => {
     if (!checkIn || !checkOut) return;

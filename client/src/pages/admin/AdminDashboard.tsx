@@ -20,7 +20,6 @@ import {
   HomeOutlined,
   CalendarOutlined,
   DollarOutlined,
-  RiseOutlined,
   EyeOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined

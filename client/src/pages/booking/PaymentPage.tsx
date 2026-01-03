@@ -1,5 +1,5 @@
 // src/pages/booking/PaymentPage.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Card, 
@@ -25,7 +25,6 @@ import {
   CheckCircleOutlined,
   LockOutlined
 } from '@ant-design/icons';
-import { useAuth } from '../../utils/AuthContext';
 import { 
   bookingService, 
   BookingResponse,
@@ -58,13 +57,36 @@ interface PaymentFormData {
 const PaymentPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { token } = useAuth();
   const [form] = Form.useForm();
   
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'bank'>('card');
+
+  const loadPriceBreakdown = useCallback(async (bookingData: any) => {
+    try {
+      setLoading(true);
+      const breakdown = await bookingService.calculatePrice({
+        hotel_id: bookingData.bookingData.hotel.id,
+        room_type_id: bookingData.bookingData.room.id,
+        check_in: bookingData.bookingData.checkIn,
+        check_out: bookingData.bookingData.checkOut,
+        guests: bookingData.bookingData.guests
+      });
+
+      setPaymentState({
+        bookingData: bookingData.bookingData,
+        guestDetails: bookingData.guestDetails,
+        priceBreakdown: breakdown
+      });
+    } catch (error: any) {
+      message.error(error.message || 'Failed to load payment details');
+      navigate('/dashboard');
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const bookingData = location.state;
@@ -75,32 +97,8 @@ const PaymentPage: React.FC = () => {
     }
 
     // Load price breakdown
-    const loadPriceBreakdown = async () => {
-      try {
-        setLoading(true);
-        const breakdown = await bookingService.calculatePrice({
-          hotel_id: bookingData.bookingData.hotel.id,
-          room_type_id: bookingData.bookingData.room.id,
-          check_in: bookingData.bookingData.checkIn,
-          check_out: bookingData.bookingData.checkOut,
-          guests: bookingData.bookingData.guests
-        });
-
-        setPaymentState({
-          bookingData: bookingData.bookingData,
-          guestDetails: bookingData.guestDetails,
-          priceBreakdown: breakdown
-        });
-      } catch (error: any) {
-        message.error(error.message || 'Failed to load payment details');
-        navigate('/dashboard');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPriceBreakdown();
-  }, [location.state, navigate, token]);
+    loadPriceBreakdown(bookingData);
+  }, [location.state, navigate, loadPriceBreakdown]);
 
   const handlePaymentSubmit = async (values: PaymentFormData) => {
     if (!paymentState) return;
@@ -401,7 +399,7 @@ const PaymentPage: React.FC = () => {
                   rules={[{ required: true, message: 'You must agree to the terms and conditions' }]}
                 >
                   <Checkbox>
-                    I agree to the <a href="#" onClick={(e) => e.preventDefault()}>Terms and Conditions</a> and <a href="#" onClick={(e) => e.preventDefault()}>Cancellation Policy</a>
+                    I agree to the <button type="button" onClick={(e) => e.preventDefault()}>Terms and Conditions</button> and <button type="button" onClick={(e) => e.preventDefault()}>Cancellation Policy</button>
                   </Checkbox>
                 </Form.Item>
               </Space>

@@ -26,6 +26,10 @@ import CreateHotelUI from './pages/CreateHotel/createhotel_ui';
 import EditHotelUI from './pages/EditHotel/edit_hotel_ui';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UserManagement from './pages/admin/UserManagement';
+import HotelApproval from './pages/admin/HotelApproval';
+import BookingsManagement from './pages/admin/BookingsManagement';
+import PaymentsManagement from './pages/admin/PaymentsManagement';
+import AuditLogs from './pages/admin/AuditLogs';
 import CancelBookingPage from './pages/booking/CancelBookingPage';
 import { message } from 'antd';
 import './App.css';
@@ -48,27 +52,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 // Landing page wrapper to handle the required props
 const LandingPage = () => {
   const { login } = useAuth();
-  const [isLoading, setIsLoading] = React.useState(false);
   const navigate = useNavigate();
-
-  const handleLogin = async (credentials: { email: string; password: string }) => {
-    try {
-      setIsLoading(true);
-      await login(credentials);
-      // Redirect to dashboard after successful login
-      navigate('/dashboard', { replace: true });
-    } catch (error) {
-      message.error('Login failed. Please try again.');
-      // Don't re-throw the error to prevent page refresh
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRegister = async (userData: { name: string; email: string; password: string }) => {
-    // For now, we'll just redirect to the register page
-    window.location.href = '/register';
-  };
 
   return <LandingUI />;
 };
@@ -258,6 +242,38 @@ function App() {
             element={
               <ProtectedRoute>
                 <UserManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/hotel-approval"
+            element={
+              <ProtectedRoute>
+                <HotelApproval />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/bookings"
+            element={
+              <ProtectedRoute>
+                <BookingsManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/payments"
+            element={
+              <ProtectedRoute>
+                <PaymentsManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/audit"
+            element={
+              <ProtectedRoute>
+                <AuditLogs />
               </ProtectedRoute>
             }
           />

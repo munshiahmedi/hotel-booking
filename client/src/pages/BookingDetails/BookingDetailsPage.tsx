@@ -1,14 +1,11 @@
 // src/pages/BookingDetails/BookingDetailsPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Typography, Descriptions, Button, Tag, message, Spin, Row, Col, Divider, Space } from 'antd';
+import { Card, Typography, Descriptions, Button, Tag, message, Spin, Row, Col, Space } from 'antd';
 import { 
   ArrowLeftOutlined, 
   CalendarOutlined, 
-  EnvironmentOutlined, 
-  UserOutlined,
-  DollarOutlined,
-  FileTextOutlined
+  EnvironmentOutlined
 } from '@ant-design/icons';
 import { bookingApi } from '../../services/api';
 

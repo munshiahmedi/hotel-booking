@@ -64,17 +64,6 @@ const HotelsListPage: React.FC = () => {
     fetchHotels();
   }, []);
 
-  const handleSearch = (value: string) => {
-    setSearchQuery(value);
-    // Implement search logic here
-  };
-
-  const handleFilterChange = (key: string, value: any) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  };
 
   const filteredHotels = Array.isArray(hotels) ? hotels.filter(hotel => {
     // Add safety checks for hotel properties

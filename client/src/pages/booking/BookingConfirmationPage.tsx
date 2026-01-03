@@ -1,5 +1,5 @@
 // src/pages/booking/BookingConfirmationPage.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Card, 
@@ -22,7 +22,6 @@ import {
   EnvironmentOutlined,
   CheckCircleOutlined
 } from '@ant-design/icons';
-import { useAuth } from '../../utils/AuthContext';
 import { 
   bookingService, 
   GuestDetails, 
@@ -46,7 +45,6 @@ interface BookingState {
 const BookingConfirmationPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { } = useAuth();
   const [bookingState, setBookingState] = useState<BookingState | null>(null);
   const [bookingPreview, setBookingPreview] = useState<BookingPreview | null>(null);
   const [priceBreakdown, setPriceBreakdown] = useState<PriceBreakdownType | null>(null);
@@ -55,7 +53,7 @@ const BookingConfirmationPage: React.FC = () => {
   const [step, setStep] = useState<'preview' | 'details' | 'payment'>('preview');
   const [guestDetails, setGuestDetails] = useState<GuestDetails | null>(null);
 
-  const fetchBookingPreview = async (state: BookingState) => {
+  const fetchBookingPreview = useCallback(async (state: BookingState) => {
     try {
       setLoading(true);
       
@@ -76,7 +74,7 @@ const BookingConfirmationPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
 
   useEffect(() => {
     // Get booking data from navigation state

@@ -1,5 +1,5 @@
 // src/pages/admin/UserManagement.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Card,
@@ -56,18 +56,9 @@ const UserManagement: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [addModalVisible, setAddModalVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [form] = Form.useForm();
 
-  useEffect(() => {
-    fetchUsers();
-  }, [token]);
-
-  useEffect(() => {
-    filterUsers();
-  }, [users, searchText, statusFilter, roleFilter]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -81,9 +72,9 @@ const UserManagement: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
-  const filterUsers = () => {
+  const filterUsers = useCallback(() => {
     let filtered = users;
 
     if (searchText) {
@@ -102,10 +93,17 @@ const UserManagement: React.FC = () => {
     }
 
     setFilteredUsers(filtered);
-  };
+  }, [users, searchText, statusFilter, roleFilter]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [token, fetchUsers]);
+
+  useEffect(() => {
+    filterUsers();
+  }, [filterUsers]);
 
   const handleEditUser = (user: User) => {
-    setSelectedUser(user);
     form.setFieldsValue(user);
     setEditModalVisible(true);
   };
@@ -115,7 +113,6 @@ const UserManagement: React.FC = () => {
       // Mock update - replace with actual API call
       message.success('User updated successfully');
       setEditModalVisible(false);
-      setSelectedUser(null);
       form.resetFields();
       fetchUsers();
     } catch (error) {
@@ -380,7 +377,6 @@ const UserManagement: React.FC = () => {
         open={editModalVisible}
         onCancel={() => {
           setEditModalVisible(false);
-          setSelectedUser(null);
           form.resetFields();
         }}
         footer={null}

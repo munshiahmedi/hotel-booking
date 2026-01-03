@@ -1,7 +1,7 @@
 // src/components/booking/GuestDetailsForm.tsx
 import React from 'react';
-import { Card, Form, Input, Button, Typography, Row, Col, Divider, message } from 'antd';
-import { UserOutlined, PhoneOutlined, MailOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { Card, Form, Input, Button, Typography, Divider } from 'antd';
+import { UserOutlined, PhoneOutlined, MailOutlined } from '@ant-design/icons';
 import { GuestDetails } from '../../services/booking.service';
 
 const { Title, Text } = Typography;

@@ -1,439 +1,603 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Col, Row, Statistic, Descriptions, Spin, Button, Typography } from 'antd';
+import { Card, Col, Row, Statistic, Spin, Button, Typography, Avatar, Dropdown, Menu, Badge, Progress, Input, Descriptions, Divider, Form, DatePicker, InputNumber, Select } from 'antd';
 import { 
   HomeOutlined, 
-  LaptopOutlined, 
   UserOutlined,
-  ProfileOutlined,
-  EnvironmentOutlined,
   CalendarOutlined,
   SearchOutlined,
-  PlusOutlined,
-  CheckCircleOutlined,
-  CreditCardOutlined,
-  RestOutlined,
-  TeamOutlined,
-  BookOutlined,
-  EditOutlined,
-  DashboardOutlined,
-  KeyOutlined,
+  FileTextOutlined,
+  BarChartOutlined,
+  CustomerServiceOutlined,
+  BellOutlined,
+  SettingOutlined,
+  LogoutOutlined,
   DollarOutlined,
-  StarOutlined
+  TeamOutlined,
+  RiseOutlined,
+  FallOutlined,
+  PlusOutlined,
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+  StarOutlined,
+  EnvironmentOutlined,
+  ArrowRightOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  ExclamationCircleOutlined
 } from '@ant-design/icons';
 import { useAuth } from '../../utils/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import dayjs from 'dayjs';
 
-const API_BASE_URL = 'http://localhost:3000/api';
-
-interface UserInfo {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  phone?: string;
-}
-
-interface Hotel {
-  id: number;
-  name: string;
-  slug: string;
-  status: string;
-}
-
-interface Session {
-  id: number;
-  ip_address: string;
-  user_agent: string;
-  expires_at: string;
-  created_at: string;
-}
-
-const { Title } = Typography;
+const { Title, Text } = Typography;
+const { Search } = Input;
 
 const DashboardUI: React.FC = () => {
   const { user, token } = useAuth();
   const navigate = useNavigate();
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [myHotels, setMyHotels] = useState<Hotel[]>([]);
-  const [mySessions, setMySessions] = useState<Session[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      if (!token) return;
+  const handleLogout = () => {
+    navigate('/login');
+  };
 
-      try {
-        const headers = { Authorization: `Bearer ${token}` };
+  const userMenuItems = [
+    { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
+    { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
+    { type: 'divider' as const },
+    { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', onClick: handleLogout }
+  ];
 
-        // Fetch user profile
-        const profileRes = await axios.get(`${API_BASE_URL}/users/profile`, { headers });
-        setUserInfo(profileRes.data);
+  const sidebarMenuItems = [
+    {
+      key: 'dashboard',
+      icon: <HomeOutlined />,
+      label: 'Dashboard',
+      active: true
+    },
+    {
+      key: 'bookings',
+      icon: <CalendarOutlined />,
+      label: 'My Bookings',
+      badge: 3
+    },
+    {
+      key: 'hotels',
+      icon: <HomeOutlined />,
+      label: 'My Hotels',
+      badge: 2
+    },
+    {
+      key: 'messages',
+      icon: <FileTextOutlined />,
+      label: 'Messages',
+      badge: 5
+    },
+    {
+      key: 'analytics',
+      icon: <BarChartOutlined />,
+      label: 'Analytics'
+    },
+    {
+      key: 'support',
+      icon: <CustomerServiceOutlined />,
+      label: 'Support'
+    }
+  ];
 
-        // Fetch my hotels
-        const hotelsRes = await axios.get(`${API_BASE_URL}/hotels/my-hotels`, { headers });
-        console.log('Hotels API response:', hotelsRes.data);
-        console.log('Hotels array length:', hotelsRes.data?.hotels?.length);
-        setMyHotels(hotelsRes.data.hotels || []);
-
-        // Fetch my sessions
-        const sessionsRes = await axios.get(`${API_BASE_URL}/sessions/my-sessions`, { headers });
-        setMySessions(sessionsRes.data);
-      } catch (error) {
-        console.error('Failed to fetch dashboard data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDashboardData();
-  }, [token]);
+  const recentActivity = [
+    { user: 'John Doe', action: 'booked a hotel', time: '2 hours ago', avatar: 'JD' },
+    { user: 'Sarah Smith', action: 'left a review', time: '4 hours ago', avatar: 'SS' },
+    { user: 'Mike Johnson', action: 'canceled booking', time: '6 hours ago', avatar: 'MJ' },
+    { user: 'Emma Wilson', action: 'made a payment', time: '8 hours ago', avatar: 'EW' },
+    { user: 'Tom Brown', action: 'updated profile', time: '1 day ago', avatar: 'TB' }
+  ];
 
   if (loading) {
     return (
-      <div className="p-6 flex justify-center items-center">
+      <div className="flex justify-center items-center h-screen">
         <Spin size="large" />
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      <Title level={1} className="mb-6">Dashboard</Title>
-      
-      {/* User Info Section */}
-      <Card title="Logged-in User Info" className="mb-6">
-        <Descriptions column={3}>
-          <Descriptions.Item label="Name">{userInfo?.name || user?.name}</Descriptions.Item>
-          <Descriptions.Item label="Email">{userInfo?.email || user?.email}</Descriptions.Item>
-          <Descriptions.Item label="Role">{typeof userInfo?.role === 'string' ? userInfo?.role : (typeof user?.role === 'string' ? user?.role : 'N/A')}</Descriptions.Item>
-        </Descriptions>
-      </Card>
-
-      {/* Navigation Cards */}
-      <Title level={3} className="mb-4">Quick Actions</Title>
-      
-      {/* Debug info - remove later */}
-      <div style={{background: '#f0f0f0', padding: '10px', marginBottom: '20px', fontSize: '12px'}}>
-        Debug: user.email = {user?.email || 'undefined'}, user.role = {user?.role || 'undefined'}
-      </div>
-      
-      <Row gutter={[16, 16]} className="mb-6">
-        {/* Admin-only cards - temporarily visible for all users for testing */}
-        {true && (
-          <>
-            <Col xs={24} sm={12} md={6}>
-              <Card 
-                hoverable
-                className="text-center cursor-pointer"
-                onClick={() => navigate('/admin')}
-              >
-                <LaptopOutlined className="text-4xl text-red-500 mb-4" />
-                <Title level={4}>Admin Dashboard</Title>
-                <p className="text-gray-600">System administration and monitoring</p>
-              </Card>
-            </Col>
-            
-            <Col xs={24} sm={12} md={6}>
-              <Card 
-                hoverable
-                className="text-center cursor-pointer"
-                onClick={() => navigate('/admin/users')}
-              >
-                <UserOutlined className="text-4xl text-purple-500 mb-4" />
-                <Title level={4}>User Management</Title>
-                <p className="text-gray-600">Manage system users and permissions</p>
-              </Card>
-            </Col>
-          </>
-        )}
-        
-        <Col xs={24} sm={12} md={6}>
-          <Card 
-            hoverable
-            className="text-center cursor-pointer"
-            onClick={() => navigate('/profile')}
-          >
-            <ProfileOutlined className="text-4xl text-blue-500 mb-4" />
-            <Title level={4}>My Profile</Title>
-            <p className="text-gray-600">Manage your personal information and account settings</p>
-          </Card>
-        </Col>
-        
-        <Col xs={24} sm={12} md={6}>
-          <Card 
-            hoverable
-            className="text-center cursor-pointer"
-            onClick={() => navigate('/my-addresses')}
-          >
-            <EnvironmentOutlined className="text-4xl text-green-500 mb-4" />
-            <Title level={4}>My Addresses</Title>
-            <p className="text-gray-600">Manage your shipping and billing addresses</p>
-          </Card>
-        </Col>
-        
-        <Col xs={24} sm={12} md={6}>
-          <Card 
-            hoverable
-            className="text-center cursor-pointer"
-            onClick={() => navigate('/my-bookings')}
-          >
-            <CalendarOutlined className="text-4xl text-orange-500 mb-4" />
-            <Title level={4}>My Bookings</Title>
-            <p className="text-gray-600">View your hotel bookings and reservations</p>
-          </Card>
-        </Col>
-        
-        <Col xs={24} sm={12} md={6}>
-          <Card 
-            hoverable
-            className="text-center cursor-pointer"
-            onClick={() => navigate('/my-hotels')}
-          >
-            <HomeOutlined className="text-4xl text-blue-500 mb-4" />
-            <Title level={4}>My Hotels</Title>
-            <p className="text-gray-600">Manage your hotel properties</p>
-          </Card>
-        </Col>
-        
-        <Col xs={24} sm={12} md={6}>
-          <Card 
-            hoverable
-            className="text-center cursor-pointer"
-            onClick={() => navigate('/hotels')}
-          >
-            <SearchOutlined className="text-4xl text-purple-500 mb-4" />
-            <Title level={4}>Explore Hotels</Title>
-            <p className="text-gray-600">Discover and book new hotels</p>
-          </Card>
-        </Col>
-        
-        <Col xs={24} sm={12} md={6}>
-          <Card 
-            hoverable
-            className="text-center cursor-pointer"
-            onClick={() => navigate('/create-hotel')}
-          >
-            <PlusOutlined className="text-4xl text-teal-500 mb-4" />
-            <Title level={4}>Create Hotel</Title>
-            <p className="text-gray-600">Add a new hotel property</p>
-          </Card>
-        </Col>
-        
-        <Col xs={24} sm={12} md={6}>
-          <Card 
-            hoverable
-            className="text-center cursor-pointer"
-            onClick={() => navigate('/booking-confirmation')}
-          >
-            <CheckCircleOutlined className="text-4xl text-green-500 mb-4" />
-            <Title level={4}>Booking Confirmation</Title>
-            <p className="text-gray-600">View booking confirmations</p>
-          </Card>
-        </Col>
-        
-        <Col xs={24} sm={12} md={6}>
-          <Card 
-            hoverable
-            className="text-center cursor-pointer"
-            onClick={() => navigate('/payment')}
-          >
-            <CreditCardOutlined className="text-4xl text-yellow-500 mb-4" />
-            <Title level={4}>Payment</Title>
-            <p className="text-gray-600">Manage payment methods</p>
-          </Card>
-        </Col>
-        
-        <Col xs={24} sm={12} md={6}>
-          <Card 
-            hoverable
-            className="text-center cursor-pointer"
-            onClick={() => navigate('/payment-result')}
-          >
-            <RestOutlined className="text-4xl text-indigo-500 mb-4" />
-            <Title level={4}>Payment Result</Title>
-            <p className="text-gray-600">View payment results</p>
-          </Card>
-        </Col>
-        
-        <Col xs={24} sm={12} md={6}>
-          <Card 
-            hoverable
-            className="text-center cursor-pointer"
-            onClick={() => navigate('/user-management')}
-          >
-            <TeamOutlined className="text-4xl text-cyan-500 mb-4" />
-            <Title level={4}>User Management</Title>
-            <p className="text-gray-600">Manage user accounts</p>
-          </Card>
-        </Col>
-        
-        <Col xs={24} sm={12} md={6}>
-          <Card 
-            hoverable
-            className="text-center cursor-pointer"
-            onClick={() => navigate('/hotels/:id/book')}
-          >
-            <BookOutlined className="text-4xl text-pink-500 mb-4" />
-            <Title level={4}>Create Booking</Title>
-            <p className="text-gray-600">Create new booking</p>
-          </Card>
-        </Col>
-        
-        <Col xs={24} sm={12} md={6}>
-          <Card 
-            hoverable
-            className="text-center cursor-pointer"
-            onClick={() => navigate('/hotels/:id/edit')}
-          >
-            <EditOutlined className="text-4xl text-orange-500 mb-4" />
-            <Title level={4}>Edit Hotel</Title>
-            <p className="text-gray-600">Edit hotel details</p>
-          </Card>
-        </Col>
-        
-        <Col xs={24} sm={12} md={6}>
-          <Card 
-            hoverable
-            className="text-center cursor-pointer"
-            onClick={() => navigate('/hotels/:hotelId/dashboard')}
-          >
-            <DashboardOutlined className="text-4xl text-purple-500 mb-4" />
-            <Title level={4}>Hotel Dashboard</Title>
-            <p className="text-gray-600">Hotel management dashboard</p>
-          </Card>
-        </Col>
-        
-        <Col xs={24} sm={12} md={6}>
-          <Card 
-            hoverable
-            className="text-center cursor-pointer"
-            onClick={() => navigate('/hotels/:hotelId/rooms')}
-          >
-            <KeyOutlined className="text-4xl text-green-500 mb-4" />
-            <Title level={4}>Rooms Management</Title>
-            <p className="text-gray-600">Manage hotel rooms</p>
-          </Card>
-        </Col>
-        
-        <Col xs={24} sm={12} md={6}>
-          <Card 
-            hoverable
-            className="text-center cursor-pointer"
-            onClick={() => navigate('/hotels/:hotelId/pricing')}
-          >
-            <DollarOutlined className="text-4xl text-yellow-600 mb-4" />
-            <Title level={4}>Pricing Management</Title>
-            <p className="text-gray-600">Manage room pricing</p>
-          </Card>
-        </Col>
-        
-        <Col xs={24} sm={12} md={6}>
-          <Card 
-            hoverable
-            className="text-center cursor-pointer"
-            onClick={() => navigate('/hotels/:hotelId/amenities')}
-          >
-            <StarOutlined className="text-4xl text-blue-500 mb-4" />
-            <Title level={4}>Amenities & Facilities</Title>
-            <p className="text-gray-600">Manage hotel amenities</p>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Stats Cards */}
-      <Title level={3} className="mb-4">Overview</Title>
-      <Row gutter={[16, 16]} className="mb-6">
-        <Col xs={24} sm={8}>
-          <Card>
-            <Statistic
-              title="My Hotels"
-              value={myHotels.length}
-              prefix={<HomeOutlined />}
-              styles={{ content: { color: '#1890ff' } }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={8}>
-          <Card>
-            <Statistic
-              title="Active Sessions"
-              value={mySessions.length}
-              prefix={<LaptopOutlined />}
-              styles={{ content: { color: '#52c41a' } }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={8}>
-          <Card>
-            <Statistic
-              title="User Role"
-              value={typeof userInfo?.role === 'string' ? userInfo?.role : (typeof user?.role === 'string' ? user?.role : 'N/A')}
-              prefix={<UserOutlined />}
-              styles={{ content: { color: '#722ed1' } }}
-            />
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Recent Sessions */}
-      {mySessions.length > 0 && (
-        <Card title="Recent Sessions" className="mb-6">
-          <div className="space-y-2">
-            {mySessions.slice(0, 3).map((session) => (
-              <div key={session.id} className="border-b pb-2">
-                <p className="m-0 text-gray-600">IP: {session.ip_address}</p>
-                <p className="m-0 text-sm text-gray-400">
-                  {new Date(session.created_at).toLocaleString()}
-                </p>
-              </div>
-            ))}
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <div className={`${collapsed ? 'w-20' : 'w-64'} bg-gray-900 flex flex-col transition-all duration-300`}>
+        {/* Logo */}
+        <div className="p-6 border-b border-gray-800">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <HomeOutlined className="text-white text-lg" />
+            </div>
+            {!collapsed && <span className="text-xl font-bold text-white">HotelHub</span>}
           </div>
-        </Card>
-      )}
-
-      {/* My Hotels */}
-      <Card title="My Hotels">
-        <div className="mb-2">
-          <small>Debug: Hotels count = {myHotels.length}</small>
         </div>
-        {myHotels.length > 0 ? (
-          <div className="space-y-2">
-            {myHotels.map((hotel) => (
-              <div key={hotel.id} className="border-b pb-2">
-                <p className="m-0">
-                  <Button 
-                    type="link" 
-                    onClick={() => {
-                      console.log('Hotel clicked:', hotel.id, hotel.name);
-                      navigate('/my-hotels');
-                    }}
-                    className="p-0 text-gray-800 font-medium"
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {hotel.name}
-                  </Button>
-                </p>
-                <p className="m-0 text-sm text-gray-400">Status: {hotel.status}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-4">
-            <p className="text-gray-500">No hotels found. Create your first hotel!</p>
-            <Button 
-              type="primary" 
+
+        {/* Navigation */}
+        <div className="flex-1 py-6">
+          {sidebarMenuItems.map((item) => (
+            <div
+              key={item.key}
+              className={`px-6 py-3 flex items-center space-x-3 cursor-pointer transition-colors ${
+                item.active ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+              }`}
               onClick={() => {
-                console.log('Create Hotel button clicked');
-                navigate('/create-hotel');
+                if (item.key === 'bookings') navigate('/my-bookings');
+                else if (item.key === 'hotels') navigate('/my-hotels');
+                else if (item.key === 'explore') navigate('/hotels');
+                else if (item.key === 'profile') navigate('/profile');
               }}
-              className="mt-2"
             >
-              Create Hotel
-            </Button>
+              <span className="text-lg">{item.icon}</span>
+              {!collapsed && (
+                <>
+                  <span className="flex-1">{item.label}</span>
+                  {item.badge && (
+                    <Badge count={item.badge} size="small" />
+                  )}
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Collapse Button */}
+        <div className="p-4 border-t border-gray-800">
+          <Button
+            type="text"
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            className="w-full text-gray-300 hover:text-white"
+          />
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <header className="bg-white shadow-sm px-8 py-4 flex items-center justify-between">
+          <div className="flex-1 max-w-xl">
+            <Search
+              placeholder="Search..."
+              allowClear
+              className="w-full"
+              prefix={<SearchOutlined />}
+            />
           </div>
-        )}
-      </Card>
+          
+          <div className="flex items-center space-x-4">
+            {/* Notifications */}
+            <Badge count={3} size="small">
+              <Button type="text" icon={<BellOutlined />} className="flex items-center justify-center w-10 h-10" />
+            </Badge>
+            
+            {/* User Profile */}
+            <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+              <div className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 px-3 py-2 rounded-lg">
+                <Avatar 
+                  src="https://picsum.photos/seed/user/40/40" 
+                  size="large"
+                  className="bg-blue-600"
+                >
+                  {(user?.name && typeof user.name === 'string' ? user.name[0] : 'U')}
+                </Avatar>
+                <div>
+                  <div className="font-semibold text-gray-900">
+                    {(user?.name && typeof user.name === 'string' ? user.name : 'User')}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {(user?.role && typeof user.role === 'string' ? user.role : 'User')}
+                  </div>
+                </div>
+              </div>
+            </Dropdown>
+          </div>
+        </header>
+
+        {/* Dashboard Content */}
+        <div className="flex-1 overflow-auto p-8">
+          {/* Welcome Section */}
+          <div className="mb-8">
+            <Title level={2} className="mb-2">Welcome back, {(user?.name && typeof user.name === 'string' ? user.name : 'User')}!</Title>
+            <Text type="secondary">Here's what's happening with your hotel bookings today.</Text>
+          </div>
+
+          {/* Stats Cards */}
+          <Row gutter={[24, 24]} className="mb-8">
+            <Col xs={24} sm={12} lg={6}>
+              <Card className="h-32 hover:shadow-lg transition-shadow border-l-4 border-blue-500">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="text-3xl font-bold text-gray-900">$8,282</div>
+                    <div className="text-gray-500 text-sm mt-1">Total Revenue</div>
+                    <div className="flex items-center mt-2 text-green-600 text-xs">
+                      <RiseOutlined className="mr-1" />
+                      +12.5% from last month
+                    </div>
+                  </div>
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <DollarOutlined className="text-blue-600 text-xl" />
+                  </div>
+                </div>
+              </Card>
+            </Col>
+
+            <Col xs={24} sm={12} lg={6}>
+              <Card className="h-32 hover:shadow-lg transition-shadow border-l-4 border-green-500">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="text-3xl font-bold text-gray-900">1,293</div>
+                    <div className="text-gray-500 text-sm mt-1">Total Bookings</div>
+                    <div className="flex items-center mt-2 text-green-600 text-xs">
+                      <RiseOutlined className="mr-1" />
+                      +8.2% from last month
+                    </div>
+                  </div>
+                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <CalendarOutlined className="text-green-600 text-xl" />
+                  </div>
+                </div>
+              </Card>
+            </Col>
+
+            <Col xs={24} sm={12} lg={6}>
+              <Card className="h-32 hover:shadow-lg transition-shadow border-l-4 border-purple-500">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="text-3xl font-bold text-gray-900">2</div>
+                    <div className="text-gray-500 text-sm mt-1">My Hotels</div>
+                    <div className="flex items-center mt-2 text-red-600 text-xs">
+                      <FallOutlined className="mr-1" />
+                      -3.1% from last month
+                    </div>
+                  </div>
+                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <HomeOutlined className="text-purple-600 text-xl" />
+                  </div>
+                </div>
+              </Card>
+            </Col>
+
+            <Col xs={24} sm={12} lg={6}>
+              <Card className="h-32 hover:shadow-lg transition-shadow border-l-4 border-orange-500">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="text-3xl font-bold text-gray-900">892</div>
+                    <div className="text-gray-500 text-sm mt-1">Total Users</div>
+                    <div className="flex items-center mt-2 text-green-600 text-xs">
+                      <RiseOutlined className="mr-1" />
+                      +18.7% from last month
+                    </div>
+                  </div>
+                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <TeamOutlined className="text-orange-600 text-xl" />
+                  </div>
+                </div>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Additional Cards Section */}
+          <Row gutter={[24, 24]} className="mb-8">
+            {/* Hotel Information Card */}
+            <Col xs={24} lg={12}>
+              <Card title="Featured Hotel" className="h-64">
+                <Descriptions column={2} size="small">
+                  <Descriptions.Item label="Hotel Name" span={2}>
+                    <Title level={5} className="m-0">Grand Plaza Hotel</Title>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Rating">
+                    <div className="flex items-center">
+                      <StarOutlined className="mr-1 text-yellow-500" />
+                      <span>4.5 Stars</span>
+                    </div>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Status">
+                    <span className="px-2 py-1 rounded text-sm bg-green-100 text-green-800">
+                      Active
+                    </span>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Address" span={2}>
+                    <div className="flex items-start">
+                      <EnvironmentOutlined className="mr-2 mt-1 text-gray-400" />
+                      <Text>123 Main Street, New York, NY 10001</Text>
+                    </div>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Description" span={2}>
+                    <Text className="text-gray-600">Luxury hotel with premium amenities and excellent service in the heart of the city.</Text>
+                  </Descriptions.Item>
+                </Descriptions>
+                <div className="mt-4">
+                  <Button type="primary" size="small" onClick={() => navigate('/hotels/1')}>
+                    View Details <ArrowRightOutlined />
+                  </Button>
+                </div>
+              </Card>
+            </Col>
+
+            {/* Quick Booking Card */}
+            <Col xs={24} lg={12}>
+              <Card title="Quick Booking" className="h-64">
+                <Form layout="vertical" size="small">
+                  <Form.Item label="Check-in Date">
+                    <DatePicker 
+                      style={{ width: '100%' }} 
+                      placeholder="Select check-in date"
+                      defaultValue={dayjs()}
+                    />
+                  </Form.Item>
+                  <Form.Item label="Check-out Date">
+                    <DatePicker 
+                      style={{ width: '100%' }} 
+                      placeholder="Select check-out date"
+                      defaultValue={dayjs().add(1, 'day')}
+                    />
+                  </Form.Item>
+                  <Row gutter={8}>
+                    <Col span={12}>
+                      <Form.Item label="Guests">
+                        <InputNumber min={1} max={10} placeholder="Guests" style={{ width: '100%' }} />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item label="Rooms">
+                        <InputNumber min={1} max={5} placeholder="Rooms" style={{ width: '100%' }} />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  <Form.Item>
+                    <Button type="primary" block onClick={() => navigate('/hotels')}>
+                      Search Hotels
+                    </Button>
+                  </Form.Item>
+                </Form>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* More Statistics Cards */}
+          <Row gutter={[24, 24]} className="mb-8">
+            <Col xs={24} sm={12} md={6}>
+              <Card className="text-center hover:shadow-lg transition-shadow">
+                <div className="py-4">
+                  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <ExclamationCircleOutlined className="text-red-600 text-2xl" />
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900">12</div>
+                  <div className="text-gray-500 text-sm">Pending Bookings</div>
+                  <div className="text-xs text-orange-600 mt-2">Requires attention</div>
+                </div>
+              </Card>
+            </Col>
+
+            <Col xs={24} sm={12} md={6}>
+              <Card className="text-center hover:shadow-lg transition-shadow">
+                <div className="py-4">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <ClockCircleOutlined className="text-blue-600 text-2xl" />
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900">45</div>
+                  <div className="text-gray-500 text-sm">Upcoming Check-ins</div>
+                  <div className="text-xs text-blue-600 mt-2">Next 24 hours</div>
+                </div>
+              </Card>
+            </Col>
+
+            <Col xs={24} sm={12} md={6}>
+              <Card className="text-center hover:shadow-lg transition-shadow">
+                <div className="py-4">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <CheckCircleOutlined className="text-green-600 text-2xl" />
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900">856</div>
+                  <div className="text-gray-500 text-sm">Completed Bookings</div>
+                  <div className="text-xs text-green-600 mt-2">+15% this month</div>
+                </div>
+              </Card>
+            </Col>
+
+            <Col xs={24} sm={12} md={6}>
+              <Card className="text-center hover:shadow-lg transition-shadow">
+                <div className="py-4">
+                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <StarOutlined className="text-purple-600 text-2xl" />
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900">4.8</div>
+                  <div className="text-gray-500 text-sm">Average Rating</div>
+                  <div className="text-xs text-purple-600 mt-2">Excellent service</div>
+                </div>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Price Breakdown Card */}
+          <Row gutter={[24, 24]} className="mb-8">
+            <Col xs={24} lg={12}>
+              <Card title="Revenue Breakdown" className="h-64">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <Text strong>Room Revenue</Text>
+                      <div className="text-xs text-gray-500">Main income source</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-blue-600">$6,450</div>
+                      <div className="text-xs text-green-600">+12%</div>
+                    </div>
+                  </div>
+                  <Progress percent={78} strokeColor="#1890ff" />
+                  
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <Text strong>Additional Services</Text>
+                      <div className="text-xs text-gray-500">SPA, dining, etc.</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-green-600">$1,832</div>
+                      <div className="text-xs text-green-600">+8%</div>
+                    </div>
+                  </div>
+                  <Progress percent={22} strokeColor="#52c41a" />
+                  
+                  <Divider />
+                  <div className="flex justify-between">
+                    <Title level={5} className="m-0">Total Revenue</Title>
+                    <Title level={5} className="m-0 text-green-600">$8,282</Title>
+                  </div>
+                </div>
+              </Card>
+            </Col>
+
+            {/* Recent Bookings Summary */}
+            <Col xs={24} lg={12}>
+              <Card title="Booking Summary" className="h-64">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-3 bg-blue-50 rounded-lg">
+                      <div className="text-xl font-bold text-blue-600">24</div>
+                      <div className="text-xs text-gray-600">Today</div>
+                    </div>
+                    <div className="text-center p-3 bg-green-50 rounded-lg">
+                      <div className="text-xl font-bold text-green-600">156</div>
+                      <div className="text-xs text-gray-600">This Week</div>
+                    </div>
+                    <div className="text-center p-3 bg-purple-50 rounded-lg">
+                      <div className="text-xl font-bold text-purple-600">623</div>
+                      <div className="text-xs text-gray-600">This Month</div>
+                    </div>
+                    <div className="text-center p-3 bg-orange-50 rounded-lg">
+                      <div className="text-xl font-bold text-orange-600">1,293</div>
+                      <div className="text-xs text-gray-600">Total</div>
+                    </div>
+                  </div>
+                  
+                  <Divider />
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Occupancy Rate</span>
+                      <span className="font-semibold">78%</span>
+                    </div>
+                    <Progress percent={78} size="small" strokeColor="#1890ff" />
+                    
+                    <div className="flex justify-between text-sm">
+                      <span>Average Stay</span>
+                      <span className="font-semibold">3.2 nights</span>
+                    </div>
+                    
+                    <div className="flex justify-between text-sm">
+                      <span>Revenue per Night</span>
+                      <span className="font-semibold">$268</span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Charts and Activity */}
+          <Row gutter={[24, 24]}>
+            {/* Revenue Chart */}
+            <Col xs={24} lg={16}>
+              <Card title="Revenue Overview" className="h-96">
+                <div className="h-64 flex flex-col justify-center">
+                  <div className="mb-6">
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-gray-600">January</span>
+                      <span className="font-semibold">$12,450</span>
+                    </div>
+                    <Progress percent={75} size="small" className="mb-4" strokeColor="#1890ff" />
+                  </div>
+                  <div className="mb-6">
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-gray-600">February</span>
+                      <span className="font-semibold">$15,230</span>
+                    </div>
+                    <Progress percent={85} size="small" className="mb-4" strokeColor="#52c41a" />
+                  </div>
+                  <div className="mb-6">
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-gray-600">March</span>
+                      <span className="font-semibold">$8,920</span>
+                    </div>
+                    <Progress percent={65} size="small" className="mb-4" strokeColor="#faad14" />
+                  </div>
+                  <div className="text-center mt-4">
+                    <Text type="secondary">Revenue trends over the last 3 months</Text>
+                  </div>
+                </div>
+              </Card>
+            </Col>
+
+            {/* Recent Activity */}
+            <Col xs={24} lg={8}>
+              <Card title="Recent Activity" className="h-96">
+                <div className="space-y-4 overflow-y-auto max-h-80">
+                  {recentActivity.map((activity, index) => (
+                    <div key={index} className="flex items-start space-x-3 pb-3 border-b last:border-0">
+                      <Avatar size="small" className="bg-blue-600">
+                        {activity.avatar}
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="text-sm">
+                          <span className="font-semibold">{activity.user}</span>
+                          <span className="text-gray-500"> {activity.action}</span>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-1">{activity.time}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Quick Actions */}
+          <Card title="Quick Actions" className="mt-8">
+            <Row gutter={[16, 16]}>
+              <Col xs={24} sm={12} md={8} lg={6}>
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  className="w-full h-12"
+                  onClick={() => navigate('/create-hotel')}
+                >
+                  Add New Hotel
+                </Button>
+              </Col>
+              <Col xs={24} sm={12} md={8} lg={6}>
+                <Button
+                  icon={<SearchOutlined />}
+                  className="w-full h-12"
+                  onClick={() => navigate('/hotels')}
+                >
+                  Explore Hotels
+                </Button>
+              </Col>
+              <Col xs={24} sm={12} md={8} lg={6}>
+                <Button
+                  icon={<CalendarOutlined />}
+                  className="w-full h-12"
+                  onClick={() => navigate('/my-bookings')}
+                >
+                  View Bookings
+                </Button>
+              </Col>
+              <Col xs={24} sm={12} md={8} lg={6}>
+                <Button
+                  icon={<BarChartOutlined />}
+                  className="w-full h-12"
+                >
+                  View Analytics
+                </Button>
+              </Col>
+            </Row>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };
