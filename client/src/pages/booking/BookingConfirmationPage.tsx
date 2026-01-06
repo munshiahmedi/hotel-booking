@@ -144,22 +144,23 @@ const BookingConfirmationPage: React.FC = () => {
   const nights = moment(bookingState.checkOut).diff(moment(bookingState.checkIn), 'days');
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="mb-6">
-        <Button 
-          type="text" 
-          icon={<ArrowLeftOutlined />} 
-          onClick={() => navigate(-1)}
-          className="mb-4"
-        >
-          Back
-        </Button>
-        <Title level={2}>Booking Confirmation</Title>
-        <Text type="secondary">
-          Review your booking details and provide guest information
-        </Text>
-      </div>
+    <div className="min-h-screen bg-gray-900 text-white p-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="mb-6">
+          <Button 
+            type="text" 
+            icon={<ArrowLeftOutlined />} 
+            onClick={() => navigate(-1)}
+            className="mb-4 text-gray-400 hover:text-white"
+          >
+            Back
+          </Button>
+          <Title level={2} className="text-white">Booking Confirmation</Title>
+          <Paragraph className="text-gray-400">
+            Review your booking details and provide guest information
+          </Paragraph>
+        </div>
 
       {/* Progress Steps */}
       <div className="mb-6">
@@ -357,6 +358,7 @@ const BookingConfirmationPage: React.FC = () => {
           )}
         </Col>
       </Row>
+      </div>
     </div>
   );
 };

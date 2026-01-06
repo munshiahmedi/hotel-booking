@@ -1,9 +1,12 @@
 // src/components/booking/RoomList.tsx
 import React from 'react';
-import { Card, List, Button, Typography, Tag, Avatar, Space } from 'antd';
-import { HomeOutlined, UserOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { Card, List, Button, Typography, Tag, Avatar, Space, Row, Col, Modal } from 'antd';
+import { HomeOutlined, UserOutlined, CheckCircleOutlined, SwapOutlined } from '@ant-design/icons';
 import { Dayjs } from 'dayjs';
 import { AvailableRoomType } from '../../services/roomAvailability.service';
+import { useRoomComparison } from '../../hooks/useRoomComparison';
+import RoomComparison from './RoomComparison';
+import CompareButton from './CompareButton';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -24,6 +27,18 @@ const RoomList: React.FC<RoomListProps> = ({
   loading = false,
   selectedRoomId
 }) => {
+  const {
+    comparisonRooms,
+    isComparing,
+    addToComparison,
+    removeFromComparison,
+    clearComparison,
+    toggleComparison,
+    isInComparison,
+    maxComparisonReached
+  } = useRoomComparison();
+
+  const [showComparisonModal, setShowComparisonModal] = React.useState(false);
   const calculateTotalPrice = (basePrice: number, checkIn: Dayjs, checkOut: Dayjs) => {
     const nights = checkOut.diff(checkIn, 'days');
     return basePrice * nights;
@@ -83,6 +98,14 @@ const RoomList: React.FC<RoomListProps> = ({
               <List.Item
                 className={`border-b transition-all ${isSelected ? 'bg-blue-50 border-blue-300' : ''}`}
                 actions={[
+                  <CompareButton
+                    key="compare"
+                    room={room}
+                    isInComparison={isInComparison(room.id)}
+                    onToggleComparison={toggleComparison}
+                    maxComparisonReached={maxComparisonReached}
+                    comparisonCount={comparisonRooms.length}
+                  />,
                   <Button
                     key="book"
                     type={isSelected ? 'default' : 'primary'}
@@ -183,6 +206,28 @@ const RoomList: React.FC<RoomListProps> = ({
           }}
         />
       )}
+
+      {/* Floating Comparison Button */}
+      {isComparing && (
+        <Button
+          type="primary"
+          icon={<SwapOutlined />}
+          onClick={() => setShowComparisonModal(true)}
+          className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 shadow-lg rounded-full px-6 py-3 flex items-center space-x-2"
+        >
+          Compare {comparisonRooms.length} Rooms
+        </Button>
+      )}
+
+      {/* Comparison Modal */}
+      <RoomComparison
+        rooms={comparisonRooms}
+        selectedDates={selectedDates}
+        guests={guests}
+        isVisible={showComparisonModal}
+        onClose={() => setShowComparisonModal(false)}
+        onRoomSelect={onRoomSelect}
+      />
     </Card>
   );
 };

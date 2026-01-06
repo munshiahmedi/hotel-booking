@@ -202,32 +202,35 @@ const PaymentPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-900 text-white p-6">
       {/* Header */}
-      <div className="mb-6">
-        <Button 
-          icon={<ArrowLeftOutlined />} 
-          onClick={() => navigate(-1)}
-          className="mb-4"
-        >
-          Back to Guest Details
-        </Button>
-        <Title level={2}>Complete Your Booking</Title>
-        <Paragraph type="secondary">
-          Please provide your payment information to complete the reservation.
-        </Paragraph>
-      </div>
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-6">
+          <Button 
+            type="text" 
+            icon={<ArrowLeftOutlined />} 
+            onClick={() => navigate(-1)}
+            className="mb-4 text-gray-400 hover:text-white"
+          >
+            Back to Guest Details
+          </Button>
+          <Title level={2} className="text-white">Complete Your Booking</Title>
+          <Paragraph className="text-gray-400">
+            Please provide your payment information to complete the reservation.
+          </Paragraph>
+        </div>
 
-      <Row gutter={[24, 24]}>
-        {/* Left Column - Payment Form */}
-        <Col xs={24} lg={16}>
-          <Card 
-            title={
-              <div className="flex items-center gap-2">
-                <CreditCardOutlined />
-                <span>Payment Information</span>
-              </div>
-            }
+        <Row gutter={[24, 24]}>
+          {/* Left Column - Payment Form */}
+          <Col xs={24} lg={16}>
+            <Card 
+              className="bg-gray-800 border-gray-700"
+              title={
+                <div className="flex items-center gap-2">
+                  <CreditCardOutlined className="text-blue-400" />
+                  <span className="text-white">Payment Information</span>
+                </div>
+              }
             extra={
               <div className="flex items-center gap-1">
                 <LockOutlined className="text-green-600" />
@@ -246,30 +249,30 @@ const PaymentPage: React.FC = () => {
               }}
             >
               {/* Payment Method Selection */}
-              <Form.Item label="Payment Method" name="paymentMethod">
+              <Form.Item label={<span className="text-white">Payment Method</span>} name="paymentMethod">
                 <Radio.Group onChange={(e) => setPaymentMethod(e.target.value)}>
-                  <Radio value="card">
+                  <Radio value="card" className="text-white">
                     <Space>
-                      <CreditCardOutlined />
+                      <CreditCardOutlined className="text-blue-400" />
                       <span>Credit/Debit Card</span>
                     </Space>
                   </Radio>
-                  <Radio value="bank">
+                  <Radio value="bank" className="text-white">
                     <Space>
-                      <BankOutlined />
+                      <BankOutlined className="text-green-400" />
                       <span>Bank Transfer</span>
                     </Space>
                   </Radio>
                 </Radio.Group>
               </Form.Item>
 
-              <Divider />
+              <Divider className="border-gray-700" />
 
               {paymentMethod === 'card' ? (
                 // Card Payment Form
                 <Space direction="vertical" className="w-full" size="large">
                   <Form.Item
-                    label="Card Number"
+                    label={<span className="text-white">Card Number</span>}
                     name="cardNumber"
                     rules={[
                       { required: true, message: 'Please enter card number' },
@@ -280,6 +283,7 @@ const PaymentPage: React.FC = () => {
                       placeholder="1234 5678 9012 3456"
                       size="large"
                       maxLength={19}
+                      className="bg-gray-700 border-gray-600 text-white"
                       onChange={(e) => {
                         const value = formatCardNumber(e.target.value);
                         form.setFieldsValue({ cardNumber: value });
@@ -424,25 +428,25 @@ const PaymentPage: React.FC = () => {
         {/* Right Column - Booking Summary */}
         <Col xs={24} lg={8}>
           <Card 
-            title="Booking Summary"
-            className="sticky top-4"
+            title={<span className="text-white">Booking Summary</span>}
+            className="bg-gray-800 border-gray-700 sticky top-4"
           >
             {/* Hotel Information */}
             <div className="mb-4">
-              <Title level={5} className="mb-2">{paymentState.bookingData.hotel.name}</Title>
-              <Text type="secondary">{paymentState.bookingData.room.name}</Text>
+              <Title level={5} className="text-white mb-2">{paymentState.bookingData.hotel.name}</Title>
+              <Text className="text-gray-400">{paymentState.bookingData.room.name}</Text>
             </div>
 
-            <Divider className="my-4" />
+            <Divider className="border-gray-700 my-4" />
 
             {/* Booking Details */}
             <Space direction="vertical" className="w-full mb-4" size="small">
               <div className="flex justify-between">
-                <Text type="secondary">Check-in:</Text>
-                <Text strong>{paymentState.bookingData.checkIn}</Text>
+                <Text className="text-gray-400">Check-in:</Text>
+                <Text strong className="text-white">{paymentState.bookingData.checkIn}</Text>
               </div>
               <div className="flex justify-between">
-                <Text type="secondary">Check-out:</Text>
+                <Text className="text-gray-400">Check-out:</Text>
                 <Text strong>{paymentState.bookingData.checkOut}</Text>
               </div>
               <div className="flex justify-between">
@@ -495,6 +499,7 @@ const PaymentPage: React.FC = () => {
           </Card>
         </Col>
       </Row>
+      </div>
     </div>
   );
 };

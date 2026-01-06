@@ -31,6 +31,7 @@ import axios from 'axios';
 import { roomAvailabilityService, AvailableRoomType } from '../../services/roomAvailability.service';
 import DateGuestSelector from '../../components/booking/DateGuestSelector';
 import RoomList from '../../components/booking/RoomList';
+import WishlistButton from '../../components/wishlist/WishlistButton';
 import dayjs, { Dayjs } from 'dayjs';
 
 const API_BASE_URL = 'http://localhost:3000/api';
@@ -309,6 +310,13 @@ const HotelDetailsPage: React.FC = () => {
                 </Text>
               </div>
             )}
+          </div>
+          <div className="flex items-center gap-3">
+            <WishlistButton 
+              hotelId={hotel.id} 
+              hotelName={hotel.name}
+              showText={true}
+            />
           </div>
         </div>
 

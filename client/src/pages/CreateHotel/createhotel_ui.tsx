@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { Button, Input, Select, Checkbox, message, Card, Row, Col } from 'antd';
+import { Button, Input, Select, Checkbox, message } from 'antd';
 import { useAuth } from '../../utils/AuthContext';
 import axios from 'axios';
 
@@ -95,63 +95,71 @@ const CreateHotelUI: React.FC = () => {
   };
 
   return (
-    <div className="p-6">
-      <Card title="Create New Hotel" className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gray-900 p-6">
+      <div className="max-w-4xl mx-auto">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Hotel Name <span className="text-red-500">*</span>
+          
+          {/* Basic Information Section */}
+          <div className="bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-700">
+            <h2 className="text-xl font-semibold text-white mb-2">Basic Information</h2>
+            <p className="text-sm text-gray-400 mb-6">Essential details about your hotel</p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Hotel Name <span className="text-red-400">*</span>
                 </label>
                 <Input
                   size="large"
                   status={errors.name ? 'error' : ''}
                   {...register('name', { required: 'Hotel name is required' })}
                   placeholder="Enter hotel name"
+                  className="rounded-lg bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                 />
                 {errors.name && (
-                  <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+                  <p className="text-red-400 text-sm mt-1">{errors.name.message}</p>
                 )}
               </div>
 
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Slug <span className="text-red-500">*</span>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Slug <span className="text-red-400">*</span>
                 </label>
                 <Input
                   size="large"
                   status={errors.slug ? 'error' : ''}
                   {...register('slug', { required: 'Slug is required' })}
                   placeholder="hotel-name-url-friendly"
+                  className="rounded-lg bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                 />
                 {errors.slug && (
-                  <p className="text-red-500 text-sm mt-1">{errors.slug.message}</p>
+                  <p className="text-red-400 text-sm mt-1">{errors.slug.message}</p>
                 )}
               </div>
 
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description <span className="text-red-500">*</span>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Description <span className="text-red-400">*</span>
                 </label>
                 <TextArea
                   rows={4}
                   status={errors.description ? 'error' : ''}
                   {...register('description', { required: 'Description is required' })}
-                  placeholder="Describe your hotel..."
+                  placeholder="Describe your hotel, amenities, and what makes it special..."
+                  className="rounded-lg bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                 />
                 {errors.description && (
-                  <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
+                  <p className="text-red-400 text-sm mt-1">{errors.description.message}</p>
                 )}
               </div>
 
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Star Rating <span className="text-red-500">*</span>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Star Rating <span className="text-red-400">*</span>
                 </label>
                 <Select
                   size="large"
-                  className="w-full"
+                  className="w-full rounded-lg"
                   placeholder="Select rating"
                   value={starRating}
                   onChange={(value) => {
@@ -165,144 +173,244 @@ const CreateHotelUI: React.FC = () => {
                   ))}
                 </Select>
                 {!starRating && (
-                  <p className="text-red-500 text-sm mt-1">Star rating is required</p>
+                  <p className="text-red-400 text-sm mt-1">Star rating is required</p>
                 )}
               </div>
-            </Col>
+            </div>
+          </div>
 
-            <Col xs={24} md={12}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Address <span className="text-red-500">*</span>
+          {/* Address Section */}
+          <div className="bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-700">
+            <h2 className="text-xl font-semibold text-white mb-2">Address</h2>
+            <p className="text-sm text-gray-400 mb-6">Hotel location details</p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Street Address <span className="text-red-400">*</span>
                 </label>
-                <div className="space-y-2">
+                <Input
+                  size="large"
+                  placeholder="Street Address"
+                  status={errors.address?.line1 ? 'error' : ''}
+                  {...register('address.line1', { required: 'Street address is required' })}
+                  className="rounded-lg bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                />
+                {errors.address?.line1 && (
+                  <p className="text-red-400 text-sm mt-1">{errors.address.line1.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  City <span className="text-red-400">*</span>
+                </label>
+                <Input
+                  size="large"
+                  placeholder="City"
+                  status={errors.address?.city ? 'error' : ''}
+                  {...register('address.city', { required: 'City is required' })}
+                  className="rounded-lg bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                />
+                {errors.address?.city && (
+                  <p className="text-red-400 text-sm mt-1">{errors.address.city.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  State/Province
+                </label>
+                <Input
+                  size="large"
+                  placeholder="State/Province"
+                  status={errors.address?.state ? 'error' : ''}
+                  {...register('address.state')}
+                  className="rounded-lg bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                />
+                {errors.address?.state && (
+                  <p className="text-red-400 text-sm mt-1">{errors.address.state.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Country <span className="text-red-400">*</span>
+                </label>
+                <Input
+                  size="large"
+                  placeholder="Country"
+                  status={errors.address?.country ? 'error' : ''}
+                  {...register('address.country', { required: 'Country is required' })}
+                  className="rounded-lg bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                />
+                {errors.address?.country && (
+                  <p className="text-red-400 text-sm mt-1">{errors.address.country.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Zip Code
+                </label>
+                <Input
+                  size="large"
+                  placeholder="Zip Code"
+                  status={errors.address?.zipcode ? 'error' : ''}
+                  {...register('address.zipcode')}
+                  className="rounded-lg bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                />
+                {errors.address?.zipcode && (
+                  <p className="text-red-400 text-sm mt-1">{errors.address.zipcode.message}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Policies Section */}
+          <div className="bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-700">
+            <h2 className="text-xl font-semibold text-white mb-2">Policies</h2>
+            <p className="text-sm text-gray-400 mb-6">Check-in/out times and cancellation policy</p>
+            
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                    Check-in Time <span className="text-red-400">*</span>
+                  </label>
                   <Input
                     size="large"
-                    placeholder="Street Address"
-                    status={errors.address?.line1 ? 'error' : ''}
-                    {...register('address.line1', { required: 'Street address is required' })}
+                    placeholder="14:00"
+                    status={errors.policy?.checkin_time ? 'error' : ''}
+                    {...register('policy.checkin_time', { required: 'Check-in time is required' })}
+                    className="rounded-lg bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                    suffix={<svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
                   />
-                  {errors.address?.line1 && (
-                    <p className="text-red-500 text-sm">{errors.address.line1.message}</p>
+                  {errors.policy?.checkin_time && (
+                    <p className="text-red-400 text-sm mt-1">{errors.policy.checkin_time.message}</p>
                   )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                    Check-out Time <span className="text-red-400">*</span>
+                  </label>
                   <Input
                     size="large"
-                    placeholder="City"
-                    status={errors.address?.city ? 'error' : ''}
-                    {...register('address.city', { required: 'City is required' })}
+                    placeholder="11:00"
+                    status={errors.policy?.checkout_time ? 'error' : ''}
+                    {...register('policy.checkout_time', { required: 'Check-out time is required' })}
+                    className="rounded-lg bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                    suffix={<svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
                   />
-                  {errors.address?.city && (
-                    <p className="text-red-500 text-sm">{errors.address.city.message}</p>
-                  )}
-                  <Input
-                    size="large"
-                    placeholder="State"
-                    status={errors.address?.state ? 'error' : ''}
-                    {...register('address.state', { required: 'State is required' })}
-                  />
-                  {errors.address?.state && (
-                    <p className="text-red-500 text-sm">{errors.address.state.message}</p>
-                  )}
-                  <Input
-                    size="large"
-                    placeholder="Country"
-                    status={errors.address?.country ? 'error' : ''}
-                    {...register('address.country', { required: 'Country is required' })}
-                  />
-                  {errors.address?.country && (
-                    <p className="text-red-500 text-sm">{errors.address.country.message}</p>
-                  )}
-                  <Input
-                    size="large"
-                    placeholder="Zip Code"
-                    status={errors.address?.zipcode ? 'error' : ''}
-                    {...register('address.zipcode', { required: 'Zip code is required' })}
-                  />
-                  {errors.address?.zipcode && (
-                    <p className="text-red-500 text-sm">{errors.address.zipcode.message}</p>
+                  {errors.policy?.checkout_time && (
+                    <p className="text-red-400 text-sm mt-1">{errors.policy.checkout_time.message}</p>
                   )}
                 </div>
               </div>
 
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Policy <span className="text-red-500">*</span>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Cancellation Policy <span className="text-red-400">*</span>
                 </label>
-                <div className="space-y-2">
-                  <div>
-                    <label className="text-xs text-gray-600">Check-in Time</label>
-                    <Input
-                      size="large"
-                      placeholder="14:00"
-                      status={errors.policy?.checkin_time ? 'error' : ''}
-                      {...register('policy.checkin_time', { required: 'Check-in time is required' })}
-                    />
-                    {errors.policy?.checkin_time && (
-                      <p className="text-red-500 text-sm">{errors.policy.checkin_time.message}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-600">Check-out Time</label>
-                    <Input
-                      size="large"
-                      placeholder="11:00"
-                      status={errors.policy?.checkout_time ? 'error' : ''}
-                      {...register('policy.checkout_time', { required: 'Check-out time is required' })}
-                    />
-                    {errors.policy?.checkout_time && (
-                      <p className="text-red-500 text-sm">{errors.policy.checkout_time.message}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-600">Cancellation Policy</label>
-                    <TextArea
-                      rows={2}
-                      placeholder="Free cancellation up to 24 hours before check-in"
-                      status={errors.policy?.cancellation_policy ? 'error' : ''}
-                      {...register('policy.cancellation_policy', { required: 'Cancellation policy is required' })}
-                    />
-                    {errors.policy?.cancellation_policy && (
-                      <p className="text-red-500 text-sm">{errors.policy.cancellation_policy.message}</p>
-                    )}
-                  </div>
-                </div>
+                <TextArea
+                  rows={4}
+                  placeholder="Enter your cancellation policy details..."
+                  status={errors.policy?.cancellation_policy ? 'error' : ''}
+                  {...register('policy.cancellation_policy', { required: 'Cancellation policy is required' })}
+                  className="rounded-lg bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                />
+                {errors.policy?.cancellation_policy && (
+                  <p className="text-red-400 text-sm mt-1">{errors.policy.cancellation_policy.message}</p>
+                )}
               </div>
+            </div>
+          </div>
 
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Facilities
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {facilities.map((facility) => (
-                    <Checkbox
-                      key={facility}
-                      checked={(watch('facilities') || []).includes(facility)}
-                      onChange={(e) => {
-                        const currentFacilities = watch('facilities') || [];
-                        if (e.target.checked) {
-                          setValue('facilities', [...currentFacilities, facility]);
-                        } else {
-                          setValue(
-                            'facilities',
-                            currentFacilities.filter((f) => f !== facility)
-                          );
-                        }
-                      }}
-                    >
-                      {facility}
-                    </Checkbox>
-                  ))}
-                </div>
+          {/* Facilities & Amenities Section */}
+          <div className="bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-700">
+            <h2 className="text-xl font-semibold text-white mb-2">Facilities & Amenities</h2>
+            <p className="text-sm text-gray-400 mb-6">Select the facilities available at your hotel</p>
+            
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="space-y-3">
+                {facilities.slice(0, 3).map((facility) => (
+                  <Checkbox
+                    key={facility}
+                    checked={(watch('facilities') || []).includes(facility)}
+                    onChange={(e) => {
+                      const currentFacilities = watch('facilities') || [];
+                      if (e.target.checked) {
+                        setValue('facilities', [...currentFacilities, facility]);
+                      } else {
+                        setValue(
+                          'facilities',
+                          currentFacilities.filter((f) => f !== facility)
+                        );
+                      }
+                    }}
+                    className="text-gray-300"
+                  >
+                    <span className="text-gray-300">{facility}</span>
+                  </Checkbox>
+                ))}
               </div>
-            </Col>
-          </Row>
+              
+              <div className="space-y-3">
+                {facilities.slice(3, 6).map((facility) => (
+                  <Checkbox
+                    key={facility}
+                    checked={(watch('facilities') || []).includes(facility)}
+                    onChange={(e) => {
+                      const currentFacilities = watch('facilities') || [];
+                      if (e.target.checked) {
+                        setValue('facilities', [...currentFacilities, facility]);
+                      } else {
+                        setValue(
+                          'facilities',
+                          currentFacilities.filter((f) => f !== facility)
+                        );
+                      }
+                    }}
+                    className="text-gray-300"
+                  >
+                    <span className="text-gray-300">{facility}</span>
+                  </Checkbox>
+                ))}
+              </div>
+              
+              <div className="space-y-3">
+                {facilities.slice(6).map((facility) => (
+                  <Checkbox
+                    key={facility}
+                    checked={(watch('facilities') || []).includes(facility)}
+                    onChange={(e) => {
+                      const currentFacilities = watch('facilities') || [];
+                      if (e.target.checked) {
+                        setValue('facilities', [...currentFacilities, facility]);
+                      } else {
+                        setValue(
+                          'facilities',
+                          currentFacilities.filter((f) => f !== facility)
+                        );
+                      }
+                    }}
+                    className="text-gray-300"
+                  >
+                    <span className="text-gray-300">{facility}</span>
+                  </Checkbox>
+                ))}
+              </div>
+            </div>
+          </div>
 
+          {/* Action Buttons */}
           <div className="flex justify-end space-x-4">
             <Button
-              type="default"
               size="large"
               onClick={() => navigate('/dashboard')}
               disabled={loading}
+              className="bg-gray-600 text-gray-200 border-gray-600 hover:bg-gray-500 rounded-lg px-8"
             >
               Cancel
             </Button>
@@ -311,12 +419,13 @@ const CreateHotelUI: React.FC = () => {
               htmlType="submit"
               size="large"
               loading={loading}
+              className="bg-blue-600 hover:bg-blue-700 border-blue-600 rounded-lg px-8"
             >
               {loading ? 'Creating...' : 'Create Hotel'}
             </Button>
           </div>
         </form>
-      </Card>
+      </div>
     </div>
   );
 };

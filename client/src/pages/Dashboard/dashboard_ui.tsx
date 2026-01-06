@@ -23,7 +23,8 @@ import {
   ArrowRightOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
-  ExclamationCircleOutlined
+  ExclamationCircleOutlined,
+  HeartOutlined
 } from '@ant-design/icons';
 import { useAuth } from '../../utils/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -67,6 +68,12 @@ const DashboardUI: React.FC = () => {
       icon: <HomeOutlined />,
       label: 'My Hotels',
       badge: 2
+    },
+    {
+      key: 'wishlist',
+      icon: <HeartOutlined />,
+      label: 'Wishlist',
+      badge: 0
     },
     {
       key: 'messages',
@@ -127,6 +134,7 @@ const DashboardUI: React.FC = () => {
               onClick={() => {
                 if (item.key === 'bookings') navigate('/my-bookings');
                 else if (item.key === 'hotels') navigate('/my-hotels');
+                else if (item.key === 'wishlist') navigate('/wishlist');
                 else if (item.key === 'explore') navigate('/hotels');
                 else if (item.key === 'profile') navigate('/profile');
               }}
@@ -590,6 +598,7 @@ const DashboardUI: React.FC = () => {
                 <Button
                   icon={<BarChartOutlined />}
                   className="w-full h-12"
+                  onClick={() => navigate('/hotel-management')}
                 >
                   View Analytics
                 </Button>

@@ -17,6 +17,7 @@ import BookingConfirmationPage from './pages/booking/BookingConfirmationPage';
 import PaymentPage from './pages/booking/PaymentPage';
 import PaymentResultPage from './pages/booking/PaymentResultPage';
 import HotelDashboard from './pages/hotel-management/HotelDashboard';
+import AnalyticsPage from './pages/AnalyticsPage';
 import RoomsManagement from './pages/hotel-management/RoomsManagement';
 import PricingManagement from './pages/hotel-management/PricingManagement';
 import AmenitiesFacilitiesManagement from './pages/hotel-management/AmenitiesFacilitiesManagement';
@@ -31,6 +32,7 @@ import BookingsManagement from './pages/admin/BookingsManagement';
 import PaymentsManagement from './pages/admin/PaymentsManagement';
 import AuditLogs from './pages/admin/AuditLogs';
 import CancelBookingPage from './pages/booking/CancelBookingPage';
+import WishlistPage from './pages/wishlist/WishlistPage';
 import { message } from 'antd';
 import './App.css';
 
@@ -128,6 +130,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <MyBookingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/wishlist"
+            element={
+              <ProtectedRoute>
+                <WishlistPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hotel-management"
+            element={
+              <ProtectedRoute>
+                <AnalyticsPage />
               </ProtectedRoute>
             }
           />
