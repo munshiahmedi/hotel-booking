@@ -273,7 +273,7 @@ const LoginPage: React.FC = () => {
                   )}
                   aria-label="Password"
                   aria-describedby={formErrors.password ? 'password-error' : undefined}
-                  onChange={() => handleFieldChange('password', '')}
+                  onChange={(e) => handleFieldChange('password', e.target.value)}
                   autoComplete="current-password"
                 />
                 {formErrors.password && (
