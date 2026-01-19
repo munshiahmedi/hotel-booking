@@ -1,18 +1,12 @@
 // src/pages/Landing/landing_ui.tsx - Comprehensive Hotel Booking Landing Page
 import React, { useState } from 'react';
-import { Button, Input, DatePicker, Card, Row, Col, Typography, Rate, Avatar, Space } from 'antd';
+import { Button, Input, DatePicker, Card, Rate, Avatar, Select, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { 
   HomeOutlined, 
   SafetyOutlined, 
   SearchOutlined,
-  GlobalOutlined,
   StarOutlined,
-  DollarOutlined,
-  ClockCircleOutlined,
-  CheckCircleOutlined,
-  TeamOutlined,
-  TrophyOutlined,
   EnvironmentOutlined,
   PhoneOutlined,
   MailOutlined,
@@ -21,8 +15,7 @@ import {
   InstagramOutlined
 } from '@ant-design/icons';
 
-const { Title, Text, Paragraph } = Typography;
-const { RangePicker } = DatePicker;
+const { Option } = Select;
 
 const LandingUI: React.FC = () => {
   const navigate = useNavigate();
@@ -30,11 +23,33 @@ const LandingUI: React.FC = () => {
     destination: '',
     checkIn: null as any,
     checkOut: null as any,
-    guests: 1
+    adults: 1,
+    children: 0,
+    rooms: 1
   });
 
+  const validateSearch = () => {
+    if (!searchData.destination) {
+      message.error('Please enter a destination');
+      return false;
+    }
+    if (!searchData.checkIn) {
+      message.error('Please select check-in date');
+      return false;
+    }
+    if (!searchData.checkOut) {
+      message.error('Please select check-out date');
+      return false;
+    }
+    if (searchData.checkIn && searchData.checkOut && (searchData.checkOut.startOf('day').isSame(searchData.checkIn.startOf('day')) || searchData.checkOut.startOf('day').isBefore(searchData.checkIn.startOf('day')))) {
+      message.error('Check-out date must be after check-in date');
+      return false;
+    }
+    return true;
+  };
+
   const handleSearch = () => {
-    if (searchData.destination) {
+    if (validateSearch()) {
       navigate('/hotels', { state: searchData });
     }
   };
@@ -94,16 +109,17 @@ const LandingUI: React.FC = () => {
           </div>
 
           {/* Search Bar */}
-          <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-5xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="md:col-span-1">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Destination</label>
                 <Input
-                  placeholder="Where to?"
+                  placeholder="City, hotel, or destination"
                   prefix={<EnvironmentOutlined className="text-gray-400" />}
                   value={searchData.destination}
                   onChange={(e) => setSearchData({...searchData, destination: e.target.value})}
                   className="w-full"
+                  size="large"
                 />
               </div>
               <div>
@@ -111,7 +127,9 @@ const LandingUI: React.FC = () => {
                 <DatePicker
                   placeholder="Check-in"
                   className="w-full"
+                  size="large"
                   onChange={(date) => setSearchData({...searchData, checkIn: date})}
+                  disabledDate={(current) => current && current.startOf('day').isBefore(new Date())}
                 />
               </div>
               <div>
@@ -119,15 +137,48 @@ const LandingUI: React.FC = () => {
                 <DatePicker
                   placeholder="Check-out"
                   className="w-full"
+                  size="large"
                   onChange={(date) => setSearchData({...searchData, checkOut: date})}
+                  disabledDate={(current) => {
+                    if (!searchData.checkIn) return current && current.startOf('day').isBefore(new Date());
+                    return current && current.startOf('day').isSame(searchData.checkIn.startOf('day')) || current.startOf('day').isBefore(searchData.checkIn.startOf('day'));
+                  }}
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Guests & Rooms</label>
+                <div className="flex gap-2">
+                  <Select
+                    value={searchData.adults}
+                    onChange={(value) => setSearchData({...searchData, adults: value})}
+                    className="flex-1"
+                    size="large"
+                    placeholder="Adults"
+                  >
+                    {[1,2,3,4,5,6].map(num => (
+                      <Option key={num} value={num}>{num} Adult{num > 1 ? 's' : ''}</Option>
+                    ))}
+                  </Select>
+                  <Select
+                    value={searchData.rooms}
+                    onChange={(value) => setSearchData({...searchData, rooms: value})}
+                    className="flex-1"
+                    size="large"
+                    placeholder="Rooms"
+                  >
+                    {[1,2,3,4].map(num => (
+                      <Option key={num} value={num}>{num} Room{num > 1 ? 's' : ''}</Option>
+                    ))}
+                  </Select>
+                </div>
               </div>
               <div className="flex items-end">
                 <Button
                   type="primary"
                   size="large"
                   onClick={handleSearch}
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium"
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold h-12 text-lg"
+                  icon={<SearchOutlined />}
                 >
                   Search Hotels
                 </Button>
@@ -149,30 +200,46 @@ const LandingUI: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { name: "New York", country: "USA", hotels: 1247 },
-              { name: "London", country: "UK", hotels: 892 },
-              { name: "Paris", country: "France", hotels: 756 },
-              { name: "Tokyo", country: "Japan", hotels: 634 },
-              { name: "Dubai", country: "UAE", hotels: 423 },
-              { name: "Singapore", country: "Singapore", hotels: 387 }
+              { name: "New York", country: "USA", hotels: 1247, image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=400&h=250&fit=crop" },
+              { name: "London", country: "UK", hotels: 892, image: "https://images.unsplash.com/photo-1513635269979-094913c99761?w=400&h=250&fit=crop" },
+              { name: "Paris", country: "France", hotels: 756, image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&h=250&fit=crop" },
+              { name: "Tokyo", country: "Japan", hotels: 634, image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&h=250&fit=crop" },
+              { name: "Dubai", country: "UAE", hotels: 423, image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400&h=250&fit=crop" },
+              { name: "Singapore", country: "Singapore", hotels: 387, image: "https://images.unsplash.com/photo-1549488344-1f9b8d2bd1f3?w=400&h=250&fit=crop" }
             ].map((destination, index) => (
               <Card 
                 key={index}
                 hoverable
-                className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-shadow"
+                className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                 cover={
-                  <div className="h-48 bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center">
-                    <GlobalOutlined className="text-6xl text-white opacity-50" />
+                  <div className="relative h-48 overflow-hidden">
+                    <img 
+                      src={destination.image} 
+                      alt={`${destination.name}, ${destination.country} - Popular destination with ${destination.hotels} hotels`}
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    <div className="absolute bottom-4 left-4 text-white">
+                      <h3 className="text-xl font-bold">{destination.name}</h3>
+                      <p className="text-sm opacity-90">{destination.country}</p>
+                    </div>
                   </div>
                 }
               >
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{destination.name}</h3>
-                  <p className="text-gray-600 mb-4">{destination.country}</p>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-500">{destination.hotels} hotels</span>
-                    <Button type="link" className="text-blue-600 p-0">
-                      Explore →
+                    <Button 
+                      type="primary" 
+                      size="small"
+                      onClick={() => {
+                        setSearchData({...searchData, destination: destination.name});
+                        setTimeout(() => handleSearch(), 100);
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700 border-none"
+                    >
+                      Explore
                     </Button>
                   </div>
                 </div>
@@ -200,7 +267,8 @@ const LandingUI: React.FC = () => {
                 location: "New York, USA",
                 rating: 4.8,
                 price: 299,
-                amenities: ["WiFi", "Pool", "Spa", "Gym"]
+                amenities: ["WiFi", "Pool", "Spa", "Gym"],
+                image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop"
               },
               {
                 id: 2,
@@ -208,7 +276,8 @@ const LandingUI: React.FC = () => {
                 location: "Miami Beach, FL",
                 rating: 4.9,
                 price: 450,
-                amenities: ["Beach Access", "Restaurant", "Bar", "Tennis"]
+                amenities: ["Beach Access", "Restaurant", "Bar", "Tennis"],
+                image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=300&fit=crop"
               },
               {
                 id: 3,
@@ -216,33 +285,41 @@ const LandingUI: React.FC = () => {
                 location: "Aspen, Colorado",
                 rating: 4.7,
                 price: 380,
-                amenities: ["Ski Access", "Fireplace", "Restaurant", "Spa"]
+                amenities: ["Ski Access", "Fireplace", "Restaurant", "Spa"],
+                image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400&h=300&fit=crop"
               }
             ].map((hotel) => (
               <Card
                 key={hotel.id}
                 hoverable
-                className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
+                className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                 cover={
-                  <div className="h-56 bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center">
-                    <HomeOutlined className="text-6xl text-white opacity-50" />
+                  <div className="relative h-56 overflow-hidden">
+                    <img 
+                      src={hotel.image} 
+                      alt={`${hotel.name} - ${hotel.location} - Rated ${hotel.rating}/5 stars, $${hotel.price} per night`}
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                      loading="lazy"
+                    />
+                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full">
+                      <div className="flex items-center">
+                        <StarOutlined className="text-yellow-400 mr-1" />
+                        <span className="font-semibold text-sm">{hotel.rating}</span>
+                      </div>
+                    </div>
                   </div>
                 }
               >
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-3">
-                    <div>
+                    <div className="flex-1">
                       <h3 className="text-xl font-bold text-gray-900 mb-1">{hotel.name}</h3>
                       <p className="text-gray-600 text-sm flex items-center">
                         <EnvironmentOutlined className="mr-1" />
                         {hotel.location}
                       </p>
                     </div>
-                    <div className="text-right">
-                      <div className="flex items-center mb-1">
-                        <StarOutlined className="text-yellow-400 mr-1" />
-                        <span className="font-semibold">{hotel.rating}</span>
-                      </div>
+                    <div className="text-right ml-4">
                       <p className="text-2xl font-bold text-blue-600">${hotel.price}</p>
                       <p className="text-xs text-gray-500">per night</p>
                     </div>
@@ -258,7 +335,7 @@ const LandingUI: React.FC = () => {
                   
                   <Button 
                     type="primary" 
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 font-semibold"
                     onClick={() => navigate(`/hotels/${hotel.id}`)}
                   >
                     View Details
@@ -395,16 +472,16 @@ const LandingUI: React.FC = () => {
             <Button 
               size="large"
               onClick={() => navigate('/hotels')}
-              className="bg-white text-blue-600 hover:bg-gray-100 px-10 py-4 text-lg font-semibold"
+              className="bg-white text-blue-600 hover:bg-gray-100 px-12 py-4 text-lg font-semibold shadow-lg"
             >
-              Browse Hotels
+              Search Hotels
             </Button>
             <Button 
               size="large"
               onClick={() => navigate('/register')}
-              className="border-white text-white hover:bg-white hover:text-blue-600 px-10 py-4 text-lg font-semibold"
+              className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg font-semibold"
             >
-              Get Started
+              Sign Up
             </Button>
           </div>
         </div>

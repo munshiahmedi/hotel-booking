@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'r
 import { AuthProvider, useAuth } from './utils/AuthContext';
 import LoginPage from './pages/Login/LoginPage';
 import RegisterPage from './pages/Register/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPassword/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPassword/ResetPasswordPage';
 import ProfilePage from './pages/Profile/ProfilePage';
 import UserManagementPage from './pages/UserManagement/UserManagementPage';
 import MyHotelsPage from './pages/MyHotels/MyHotelsPage';
@@ -73,6 +75,8 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/hotels" element={<HotelsListPage />} />
           <Route path="/hotels/:id" element={<HotelDetailsPage />} />
 

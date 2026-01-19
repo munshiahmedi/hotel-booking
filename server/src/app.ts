@@ -49,7 +49,7 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      connectSrc: ["'self'", "http://localhost:3000", "http://localhost:3001", "ws://localhost:3000", "ws://localhost:3001", "http://localhost:3000/.well-known/appspecific/com.chrome.devtools.json", "https://chrome-devtools-frontend.appspot.com"],
+      connectSrc: ["'self'", "http://localhost:3000", "ws://localhost:3000", "http://localhost:3000/.well-known/appspecific/com.chrome.devtools.json", "https://chrome-devtools-frontend.appspot.com"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", "data:", "blob:"],

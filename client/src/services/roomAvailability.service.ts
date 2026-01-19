@@ -20,6 +20,17 @@ export interface AvailableRoomType extends RoomType {
   available_rooms: number;
   total_rooms: number;
   amenities?: string[];
+  room_size?: number;
+  bed_type?: string;
+  private_bathroom?: boolean;
+  free_wifi?: boolean;
+  parking?: boolean;
+  cancellation_policy?: string;
+  guest_rating?: number;
+  breakfast_included?: boolean;
+  room_view?: string;
+  reviews_count?: number;
+  room_type?: string;
 }
 
 export interface RoomAvailabilityRequest {

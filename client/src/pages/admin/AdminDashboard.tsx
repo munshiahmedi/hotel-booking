@@ -13,7 +13,11 @@ import {
   message,
   Spin,
   Tag,
-  Progress
+  Progress,
+  Tooltip,
+  Skeleton,
+  Empty,
+  Badge
 } from 'antd';
 import {
   UserOutlined,
@@ -22,7 +26,11 @@ import {
   DollarOutlined,
   EyeOutlined,
   CheckCircleOutlined,
-  ClockCircleOutlined
+  ClockCircleOutlined,
+  InfoCircleOutlined,
+  ArrowRightOutlined,
+  PlusOutlined,
+  CrownOutlined
 } from '@ant-design/icons';
 import { useAuth } from '../../utils/AuthContext';
 
@@ -39,6 +47,11 @@ interface AdminStats {
   occupancyRate: number;
 }
 
+interface UserRole {
+  role: 'admin' | 'host' | 'moderator';
+  permissions: string[];
+}
+
 interface RecentActivity {
   id: string;
   type: 'booking' | 'hotel' | 'user' | 'payment';
@@ -51,6 +64,8 @@ const AdminDashboard: React.FC = () => {
   const { token } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [skeletonLoading, setSkeletonLoading] = useState(false);
+  const [userRole] = useState<UserRole>({ role: 'admin', permissions: ['all'] });
   const [stats, setStats] = useState<AdminStats>({
     totalUsers: 0,
     totalHotels: 0,
@@ -100,6 +115,34 @@ const AdminDashboard: React.FC = () => {
       style: 'currency',
       currency: 'USD'
     }).format(amount);
+  };
+
+  const getDataRangeLabel = () => {
+    return 'This Month';
+  };
+
+  const handleCardClick = (path: string) => {
+    navigate(path);
+  };
+
+  const handleActivityClick = (record: RecentActivity) => {
+    // Navigate based on activity type
+    switch (record.type) {
+      case 'booking':
+        navigate(`/admin/bookings`);
+        break;
+      case 'hotel':
+        navigate(`/admin/hotel-approval`);
+        break;
+      case 'user':
+        navigate(`/admin/users`);
+        break;
+      case 'payment':
+        navigate(`/admin/payments`);
+        break;
+      default:
+        break;
+    }
   };
 
   const getActivityIcon = (type: string) => {
@@ -153,9 +196,33 @@ const AdminDashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex justify-center items-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-          <p className="text-gray-400">Loading dashboard...</p>
+        <div className="max-w-7xl w-full px-6">
+          {/* Skeleton Loading States */}
+          <Row gutter={[24, 24]} className="mb-8">
+            {[1, 2, 3, 4].map((i) => (
+              <Col xs={24} sm={12} lg={6} key={i}>
+                <Card className="mb-4">
+                  <Skeleton active paragraph={{ rows: 3 }} />
+                </Card>
+              </Col>
+            ))}
+          </Row>
+          <Row gutter={[24, 24]} className="mb-8">
+            {[1, 2, 3, 4].map((i) => (
+              <Col xs={24} sm={12} lg={6} key={i}>
+                <Card className="mb-4">
+                  <Skeleton active paragraph={{ rows: 2 }} />
+                </Card>
+              </Col>
+            ))}
+          </Row>
+          <Row gutter={[24, 24]}>
+            <Col xs={24}>
+              <Card>
+                <Skeleton active paragraph={{ rows: 4 }} />
+              </Card>
+            </Col>
+          </Row>
         </div>
       </div>
     );
@@ -167,14 +234,33 @@ const AdminDashboard: React.FC = () => {
       <div className="bg-gray-800/50 backdrop-blur-lg border-b border-gray-700/50">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-2">Admin Dashboard</h1>
-              <p className="text-gray-400">Overview of system performance and activities</p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <p className="text-sm text-gray-400">Last updated</p>
-                <p className="text-white font-medium">{new Date().toLocaleTimeString()}</p>
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-3xl font-bold text-white mb-2 flex items-center">
+                  Admin Dashboard
+                  <Badge 
+                    count={userRole.role.toUpperCase()} 
+                    className="ml-3" 
+                    style={{ 
+                      backgroundColor: userRole.role === 'admin' ? '#1890ff' : '#52c41a',
+                      fontSize: '10px',
+                      height: '20px',
+                      lineHeight: '20px'
+                    }}
+                  >
+                    {userRole.role}
+                  </Badge>
+                </h1>
+                <p className="text-gray-400">Overview of system performance and activities</p>
+              </div>
+              <div className="flex items-center space-x-4">
+                <Tooltip title="Full system access - Can manage all aspects of the platform">
+                  <InfoCircleOutlined className="text-gray-400 text-sm" />
+                </Tooltip>
+                <div className="text-right">
+                  <p className="text-sm text-gray-400">Last updated</p>
+                  <p className="text-white font-medium">{new Date().toLocaleTimeString()}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -185,56 +271,100 @@ const AdminDashboard: React.FC = () => {
         {/* Key Metrics */}
         <Row gutter={[24, 24]} className="mb-8">
           <Col xs={24} sm={12} lg={6}>
-            <Card className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 border-blue-700/30 backdrop-blur-lg hover:shadow-xl transition-shadow duration-300">
+            <Card 
+              className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 border-blue-700/30 backdrop-blur-lg hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer group"
+              onClick={() => handleCardClick('/admin/users')}
+            >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-400 text-sm font-medium mb-2">Total Users</p>
+                  <div className="flex items-center mb-2">
+                    <p className="text-blue-400 text-sm font-medium">Total Users</p>
+                    <Tooltip title={getDataRangeLabel()}>
+                      <InfoCircleOutlined className="text-blue-400/60 text-xs ml-2" />
+                    </Tooltip>
+                  </div>
                   <p className="text-3xl font-bold text-white mb-1">{stats.totalUsers.toLocaleString()}</p>
-                  <p className="text-green-400 text-sm">+12.5% from last month</p>
+                  <div className="flex items-center">
+                    <p className="text-green-400 text-sm">+12.5% from last month</p>
+                    <ArrowRightOutlined className="text-blue-400/60 text-xs ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
                 </div>
-                <div className="bg-blue-600/30 p-4 rounded-2xl">
+                <div className="bg-blue-600/30 p-4 rounded-2xl group-hover:scale-110 transition-transform">
                   <UserOutlined className="text-blue-400 text-2xl" />
                 </div>
               </div>
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card className="bg-gradient-to-br from-green-600/20 to-green-800/20 border-green-700/30 backdrop-blur-lg hover:shadow-xl transition-shadow duration-300">
+            <Card 
+              className="bg-gradient-to-br from-green-600/20 to-green-800/20 border-green-700/30 backdrop-blur-lg hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer group"
+              onClick={() => handleCardClick('/admin/hotel-approval')}
+            >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-green-400 text-sm font-medium mb-2">Total Hotels</p>
+                  <div className="flex items-center mb-2">
+                    <p className="text-green-400 text-sm font-medium">Total Hotels</p>
+                    <Tooltip title={getDataRangeLabel()}>
+                      <InfoCircleOutlined className="text-green-400/60 text-xs ml-2" />
+                    </Tooltip>
+                  </div>
                   <p className="text-3xl font-bold text-white mb-1">{stats.totalHotels.toLocaleString()}</p>
-                  <p className="text-green-400 text-sm">+8.3% from last month</p>
+                  <div className="flex items-center">
+                    <p className="text-green-400 text-sm">+8.3% from last month</p>
+                    <ArrowRightOutlined className="text-green-400/60 text-xs ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
                 </div>
-                <div className="bg-green-600/30 p-4 rounded-2xl">
+                <div className="bg-green-600/30 p-4 rounded-2xl group-hover:scale-110 transition-transform">
                   <HomeOutlined className="text-green-400 text-2xl" />
                 </div>
               </div>
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 border-purple-700/30 backdrop-blur-lg hover:shadow-xl transition-shadow duration-300">
+            <Card 
+              className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 border-purple-700/30 backdrop-blur-lg hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer group"
+              onClick={() => handleCardClick('/admin/bookings')}
+            >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-400 text-sm font-medium mb-2">Total Bookings</p>
+                  <div className="flex items-center mb-2">
+                    <p className="text-purple-400 text-sm font-medium">Total Bookings</p>
+                    <Tooltip title={getDataRangeLabel()}>
+                      <InfoCircleOutlined className="text-purple-400/60 text-xs ml-2" />
+                    </Tooltip>
+                  </div>
                   <p className="text-3xl font-bold text-white mb-1">{stats.totalBookings.toLocaleString()}</p>
-                  <p className="text-green-400 text-sm">+15.2% from last month</p>
+                  <div className="flex items-center">
+                    <p className="text-green-400 text-sm">+15.2% from last month</p>
+                    <ArrowRightOutlined className="text-purple-400/60 text-xs ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
                 </div>
-                <div className="bg-purple-600/30 p-4 rounded-2xl">
+                <div className="bg-purple-600/30 p-4 rounded-2xl group-hover:scale-110 transition-transform">
                   <CalendarOutlined className="text-purple-400 text-2xl" />
                 </div>
               </div>
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card className="bg-gradient-to-br from-orange-600/20 to-orange-800/20 border-orange-700/30 backdrop-blur-lg hover:shadow-xl transition-shadow duration-300">
+            <Card 
+              className="bg-gradient-to-br from-orange-600/20 to-orange-800/20 border-orange-700/30 backdrop-blur-lg hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer group"
+              onClick={() => handleCardClick('/admin/payments')}
+            >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-orange-400 text-sm font-medium mb-2">Total Revenue</p>
+                  <div className="flex items-center mb-2">
+                    <p className="text-orange-400 text-sm font-medium">Total Revenue</p>
+                    <Tooltip title={getDataRangeLabel()}>
+                      <InfoCircleOutlined className="text-orange-400/60 text-xs ml-2" />
+                    </Tooltip>
+                  </div>
                   <p className="text-3xl font-bold text-white mb-1">{formatCurrency(stats.totalRevenue)}</p>
-                  <p className="text-green-400 text-sm">+18.7% from last month</p>
+                  <div className="flex items-center">
+                    <p className="text-green-400 text-sm">+18.7% from last month</p>
+                    <ArrowRightOutlined className="text-orange-400/60 text-xs ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
                 </div>
-                <div className="bg-orange-600/30 p-4 rounded-2xl">
+                <div className="bg-orange-600/30 p-4 rounded-2xl group-hover:scale-110 transition-transform">
                   <DollarOutlined className="text-orange-400 text-2xl" />
                 </div>
               </div>
@@ -392,7 +522,18 @@ const AdminDashboard: React.FC = () => {
                     dataIndex: 'description',
                     key: 'description',
                     render: (text: string, record: RecentActivity) => (
-                      <div className="flex items-center space-x-3">
+                      <div 
+                        className="flex items-center space-x-3 cursor-pointer hover:bg-gray-700/20 p-2 rounded-lg transition-colors"
+                        onClick={() => handleActivityClick(record)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            handleActivityClick(record);
+                          }
+                        }}
+                        aria-label={`View details for ${text}`}
+                      >
                         <div className={`p-2 rounded-lg ${
                           record.type === 'booking' ? 'bg-purple-600/20 text-purple-400' :
                           record.type === 'hotel' ? 'bg-green-600/20 text-green-400' :
@@ -402,6 +543,7 @@ const AdminDashboard: React.FC = () => {
                           {getActivityIcon(record.type)}
                         </div>
                         <span className="text-white">{text}</span>
+                        <ArrowRightOutlined className="text-gray-400/60 text-xs ml-2" />
                       </div>
                     )
                   },
@@ -428,10 +570,31 @@ const AdminDashboard: React.FC = () => {
                     )
                   }
                 ]}
-                dataSource={recentActivity}
+                dataSource={recentActivity.length > 0 ? recentActivity : []}
                 pagination={false}
                 className="bg-transparent"
-                rowClassName="border-gray-700/30 hover:bg-gray-700/20"
+                rowClassName="border-gray-700/30 hover:bg-gray-700/20 cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                locale={{
+                  emptyText: (
+                    <Empty
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
+                      description={
+                        <div className="text-center">
+                          <p className="text-gray-400 text-lg mb-4">No recent activity</p>
+                          <p className="text-gray-500 text-sm mb-6">System events and updates will appear here</p>
+                          <Button 
+                            type="primary" 
+                            icon={<PlusOutlined />}
+                            onClick={() => navigate('/admin/audit')}
+                            className="bg-blue-600 hover:bg-blue-700"
+                          >
+                            View Audit Logs
+                          </Button>
+                        </div>
+                      }
+                    />
+                  )
+                }}
               />
             </Card>
           </Col>
